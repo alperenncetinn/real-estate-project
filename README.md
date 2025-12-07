@@ -10,6 +10,6 @@ This repository contains the software development lifecycle for a Real Estate Si
 * **Elif Nida SOLAKOĞLU** - 220316037
 
 ## 🛠 Project Management & Methodology
-* [cite_start]**Methodology:** Kanban (3-5 people target group) [cite: 4]
-* [cite_start]**Project Management Tool:** [Trello/Jira/Azure Link Here] - (Constitutes 25% of grade) [cite: 7]
-* [cite_start]**Language:** [Java & C#] [cite: 52]
+* [cite_start]**Methodology:** Kanban  [cite: 4]
+* [cite_start]**Project Management Tool:** Trello [cite: 7]
+* [cite_start]**Language:** Java & C# [cite: 52]
