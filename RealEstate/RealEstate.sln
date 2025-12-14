@@ -1,8 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# 
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealEstate.Api", "RealEstate.Api\RealEstate.Api.csproj", "{14E56678-0CEB-42D6-B4FF-DD410E3D341A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealEstate.Web", "RealEstate.Web\RealEstate.Web.csproj", "{3FBD9645-5E31-407B-A12B-0397FC63CEAF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealEstate.Api.Tests", "RealEstate.Api.Tests\RealEstate.Api.Tests.csproj", "{91CA7EA2-3B15-4344-B362-1CA399A45A94}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealEstate.Web.Tests", "RealEstate.Web.Tests\RealEstate.Web.Tests.csproj", "{34706825-D775-4811-B462-3110AD826295}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +23,13 @@ Global
 		{3FBD9645-5E31-407B-A12B-0397FC63CEAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3FBD9645-5E31-407B-A12B-0397FC63CEAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3FBD9645-5E31-407B-A12B-0397FC63CEAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91CA7EA2-3B15-4344-B362-1CA399A45A94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91CA7EA2-3B15-4344-B362-1CA399A45A94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91CA7EA2-3B15-4344-B362-1CA399A45A94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91CA7EA2-3B15-4344-B362-1CA399A45A94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34706825-D775-4811-B462-3110AD826295}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34706825-D775-4811-B462-3110AD826295}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34706825-D775-4811-B462-3110AD826295}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34706825-D775-4811-B462-3110AD826295}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
