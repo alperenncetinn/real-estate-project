@@ -1,0 +1,18 @@
+# Build results
+bin/
+obj/
+*.dll
+*.pdb
+
+# IDE
+.idea/
+.vs/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+appsettings.local.json
+.env
