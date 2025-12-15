@@ -1,0 +1,62 @@
+@model RealEstate.Web.Models.CreateListingViewModel
+
+@{
+    ViewData["Title"] = "Create New Listing";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title mb-0">Yeni İlan Oluştur</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+                
+                <div class="mb-3">
+                    <label class="form-label">İlan Başlığı</label>
+                    <input asp-for="Title" class="form-control" placeholder="Örn: Deniz Manzaralı Daire" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Kapak Fotoğrafı</label>
+                    <input asp-for="Photo" type="file" class="form-control" accept="image/*" />
+                    <div class="form-text">Lütfen .jpg veya .png formatında bir görsel yükleyin.</div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Şehir</label>
+                        <select asp-for="City" class="form-control">
+                            <option value="Istanbul">İstanbul</option>
+                            <option value="Ankara">Ankara</option>
+                            <option value="Izmir">İzmir</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Fiyat (TL)</label>
+                        <input asp-for="Price" type="number" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Oda Sayısı</label>
+                        <input asp-for="RoomCount" class="form-control" placeholder="3+1" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Metrekare (m²)</label>
+                        <input asp-for="SquareMeters" type="number" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Açıklama</label>
+                    <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-success btn-lg">İlanı Yayınla</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
