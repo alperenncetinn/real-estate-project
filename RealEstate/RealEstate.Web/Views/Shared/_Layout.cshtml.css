@@ -46,3 +46,53 @@ button.accept-policy {
   white-space: nowrap;
   line-height: 60px;
 }
+
+/* Loading & Error overlays */
+.app-loading-overlay,
+.app-error-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.35);
+  z-index: 1050;
+}
+
+.app-loading-content {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 18px 22px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.app-loading-text {
+  font-weight: 600;
+}
+
+.app-error-box {
+  max-width: 520px;
+  width: calc(100% - 48px);
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.18);
+}
+
+.app-error-title {
+  margin: 0 0 8px 0;
+}
+
+.app-error-message {
+  margin-bottom: 12px;
+}
+
+.app-error-close {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+}
+

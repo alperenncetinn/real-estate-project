@@ -12,7 +12,8 @@ namespace RealEstate.Web.Services
         {
             _httpClient = httpClient;
             // TODO: Move BaseAddress to appsettings.json for production
-            _httpClient.BaseAddress = new Uri("http://localhost:5180/");
+            // Point to the running API instance
+            _httpClient.BaseAddress = new Uri("http://localhost:5001/");
         }
 
         // --- 1. LİSTELEME (Tümünü Getir) ---

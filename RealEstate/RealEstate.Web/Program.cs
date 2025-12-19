@@ -8,7 +8,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient<RealEstate.Web.Services.ApiService>();
 
 // API Client konfigürasyonu
-var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7180";
+// Varsayılan API adresini geliştirme makinesindeki çalışan API'ye işaret edecek şekilde ayarla
+var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5001";
 builder.Services.AddHttpClient<PropertyApiClient>(client =>
 {
     client.BaseAddress = new Uri(apiBaseUrl);
@@ -25,7 +26,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
@@ -34,6 +35,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+// Handle status codes (404, 500, etc.) by re-executing to ErrorController
+app.UseStatusCodePagesWithReExecute("/Error/{0}");
 
 app.UseAuthorization();
 
