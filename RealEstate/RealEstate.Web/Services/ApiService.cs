@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
-using System.Net.Http.Json; 
+using System.Net.Http.Json;
+using Microsoft.Extensions.Configuration;
 using RealEstate.Web.Models;
 
 namespace RealEstate.Web.Services
@@ -8,12 +9,11 @@ namespace RealEstate.Web.Services
     {
         private readonly HttpClient _httpClient;
 
-        public ApiService(HttpClient httpClient)
+        public ApiService(HttpClient httpClient, IConfiguration configuration)
         {
             _httpClient = httpClient;
-            // TODO: Move BaseAddress to appsettings.json for production
-            // Point to the running API instance
-            _httpClient.BaseAddress = new Uri("http://localhost:5001/");
+            var baseUrl = configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5180";
+            _httpClient.BaseAddress = new Uri(baseUrl);
         }
 
         // --- 1. LİSTELEME (Tümünü Getir) ---
@@ -40,7 +40,7 @@ namespace RealEstate.Web.Services
             content.Add(new StringContent(model.Title ?? string.Empty), "Title");
             content.Add(new StringContent(model.City ?? string.Empty), "City");
             content.Add(new StringContent(model.Price.ToString()), "Price");
-            
+
             // DTO'da varsa ekle, yoksa boş geç
             content.Add(new StringContent(model.RoomCount ?? string.Empty), "RoomCount");
             content.Add(new StringContent(model.SquareMeters.ToString()), "SquareMeters");
@@ -84,7 +84,7 @@ namespace RealEstate.Web.Services
         // --- 5. SİLME (DELETE) ---
         public async Task<bool> DeleteListingAsync(int id)
         {
-            try 
+            try
             {
                 var response = await _httpClient.DeleteAsync($"api/listings/{id}");
                 return response.IsSuccessStatusCode;
