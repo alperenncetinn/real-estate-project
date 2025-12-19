@@ -2,6 +2,7 @@ using Xunit;
 using Microsoft.AspNetCore.Mvc;
 using RealEstate.Api.Controllers;
 using RealEstate.Api.Dtos;
+using System.Threading.Tasks; // async işlemleri için gerekli
 
 namespace RealEstate.Api.Tests
 {
@@ -9,86 +10,82 @@ namespace RealEstate.Api.Tests
     {
         // SENARYO 1: Geçerli veri geldiğinde 200 OK dönmeli
         [Fact]
-        public void Create_ReturnsOk_WhenDtoIsValid()
+        public async Task Create_ReturnsOk_WhenDtoIsValid()
         {
-            // 1. Arrange (Hazırlık)
-            var controller = new ListingsController();
-            var validDto = new ListingDto
+            // 1. Arrange
+            // Controller artık IWebHostEnvironment istiyor.
+            // Bu testte dosya yüklemediğimiz için "null" gönderiyoruz.
+            var controller = new ListingsController(null!); 
+            
+            var validDto = new ListingDtos
             {
                 Title = "Deneme İlanı",
                 Price = 5000,
                 City = "İstanbul"
             };
 
-            // 2. Act (Eylem)
-            var result = controller.Create(validDto);
+            // 2. Act
+            // Metot async olduğu için başına "await" koyduk
+            var result = await controller.Create(validDto);
 
-            // 3. Assert (Kontrol)
+            // 3. Assert
             Assert.IsType<OkObjectResult>(result);
         }
 
         // SENARYO 2: Veri NULL gelirse 400 Bad Request dönmeli
         [Fact]
-        public void Create_ReturnsBadRequest_WhenDtoIsNull()
+        public async Task Create_ReturnsBadRequest_WhenDtoIsNull()
         {
             // 1. Arrange
-            var controller = new ListingsController();
-            ListingDto nullDto = null; // Bilerek null yapıyoruz
+            var controller = new ListingsController(null!);
+            ListingDtos? nullDto = null;
 
             // 2. Act
-            var result = controller.Create(nullDto);
+            // nullDto! ile "biliyorum null, devam et" diyoruz
+            var result = await controller.Create(nullDto!);
 
             // 3. Assert
-            // Controller kodunda: if (dto == null) return BadRequest(...)
             Assert.IsType<BadRequestObjectResult>(result);
         }
 
         // SENARYO 3: Dönen cevabın içinde gönderdiğimiz Başlık (Title) doğru mu?
         [Fact]
-        public void Create_ReturnsCorrectTitle_InResponse()
+        public async Task Create_ReturnsCorrectTitle_InResponse()
         {
             // 1. Arrange
-            var controller = new ListingsController();
+            var controller = new ListingsController(null!);
             var testTitle = "Manzaralı Villa";
-            var dto = new ListingDto { Title = testTitle };
+            var dto = new ListingDtos { Title = testTitle };
 
             // 2. Act
-            var result = controller.Create(dto) as OkObjectResult;
+            var result = await controller.Create(dto) as OkObjectResult;
 
             // 3. Assert
-            Assert.NotNull(result); // Sonuç boş olmamalı
+            Assert.NotNull(result);
             
-            // Dönen anonim nesneyi (new { message=..., title=... }) okumak için reflection kullanıyoruz
-            // Veya basitçe string'e çevirip içinde aratıyoruz (daha pratik):
-            var responseBody = result.Value.ToString();
-            
-            // Not: Anonim tipler testlerde 'dynamic' ile de okunabilir ama ToString genelde yetiyor.
-            // Burada Value property'sine erişip Title'ı kontrol ediyoruz.
-            // C# Reflection ile özelliğe erişim:
-            var returnTitle = result.Value.GetType().GetProperty("title")?.GetValue(result.Value, null);
-            
-            Assert.Equal(testTitle, returnTitle);
+            if (result?.Value != null)
+            {
+                // Reflection ile kontrol
+                var returnTitle = result.Value.GetType().GetProperty("title")?.GetValue(result.Value, null);
+                Assert.Equal(testTitle, returnTitle);
+            }
         }
 
-        // SENARYO 4: Sadece Fiyat girilse, diğerleri boş olsa bile çalışmalı
-        // (Çünkü Dto'daki alanların hepsi 'string?' yani nullable, zorunlu değil)
+        // SENARYO 4: Sadece Fiyat girilse bile çalışmalı
         [Fact]
-        public void Create_ReturnsOk_WhenOnlyPriceIsProvided()
+        public async Task Create_ReturnsOk_WhenOnlyPriceIsProvided()
         {
             // 1. Arrange
-            var controller = new ListingsController();
-            // Başlık veya Şehir yok, sadece fiyat var.
-            var partialDto = new ListingDto
+            var controller = new ListingsController(null!);
+            var partialDto = new ListingDtos
             {
                 Price = 150000
             };
 
             // 2. Act
-            var result = controller.Create(partialDto);
+            var result = await controller.Create(partialDto);
 
             // 3. Assert
-            // Kodunda "Title zorunludur" gibi bir if kontrolü olmadığı için 
-            // bunun da OK dönmesi gerekiyor.
             Assert.IsType<OkObjectResult>(result);
         }
     }

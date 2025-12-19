@@ -1,0 +1,75 @@
+@model RealEstate.Web.Models.CreateListingViewModel
+
+@{
+    ViewData["Title"] = "İlanı Düzenle";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">✏️ İlanı Düzenle</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">İlan Başlığı</label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Şehir</label>
+                                <input asp-for="City" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Fiyat (₺)</label>
+                                <input asp-for="Price" class="form-control" type="number" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Açıklama</label>
+                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                        </div>
+
+                        <div class="mb-4 p-3 border rounded bg-light">
+                            <label class="form-label fw-bold">📸 Fotoğraf Yönetimi</label>
+                            
+                            <div class="d-flex align-items-center gap-4">
+                                <div>
+                                    <p class="small text-muted mb-1">Şu anki Resim:</p>
+                                    @if (!string.IsNullOrEmpty(ViewBag.CurrentImage))
+                                    {
+                                        <img src="http://localhost:5180@(ViewBag.CurrentImage)" 
+                                             alt="Mevcut Resim" 
+                                             class="img-thumbnail" 
+                                             style="width: 120px; height: 80px; object-fit: cover;">
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted fst-italic">Resim Yok</span>
+                                    }
+                                </div>
+
+                                <div class="flex-grow-1">
+                                    <label class="small text-muted mb-1">Değiştirmek için yeni dosya seç:</label>
+                                    <input asp-for="Photo" type="file" class="form-control" accept="image/*" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Değişiklikleri Kaydet 💾</button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">İptal</a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
