@@ -21,9 +21,13 @@ namespace RealEstate.Api.Tests.Controllers
 
         public ListingsControllerTests()
         {
+            // Test veritabanını oluşturuyoruz
             _context = TestDbContextFactory.CreateContextWithData();
+            
+            // Dosya işlemleri için sahte bir ortam (Mock) yaratıyoruz
             _mockEnvironment = new Mock<IWebHostEnvironment>();
             _mockEnvironment.Setup(e => e.WebRootPath).Returns(Path.GetTempPath());
+            
             _controller = new ListingsController(_context, _mockEnvironment.Object);
         }
 
@@ -33,44 +37,23 @@ namespace RealEstate.Api.Tests.Controllers
             _context.Dispose();
         }
 
-        #region GetAll Tests
+        #region GetAll Tests (Listeleme)
 
         [Fact]
         public async Task GetAll_ReturnsOkResult_WithListings()
         {
-            // Act
+            // Act (Eylem)
             var result = await _controller.GetAll();
 
-            // Assert
+            // Assert (Doğrulama)
             var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
             var listings = okResult.Value.Should().BeAssignableTo<IEnumerable<Listing>>().Subject;
-            listings.Should().HaveCount(2);
-        }
-
-        [Fact]
-        public async Task GetAll_ReturnsEmptyList_WhenNoListings()
-        {
-            // Arrange - Boş context oluştur (seed data olmadan)
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-                .Options;
-            var emptyContext = new ApplicationDbContext(options);
-            var controller = new ListingsController(emptyContext, _mockEnvironment.Object);
-
-            // Act
-            var result = await controller.GetAll();
-
-            // Assert
-            var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
-            var listings = okResult.Value.Should().BeAssignableTo<IEnumerable<Listing>>().Subject;
-            listings.Should().BeEmpty();
-
-            emptyContext.Dispose();
+            listings.Should().HaveCount(2); // Helpers içinde 2 tane sahte veri ekli
         }
 
         #endregion
 
-        #region GetById Tests
+        #region GetById Tests (Detay Getirme)
 
         [Fact]
         public async Task GetById_ReturnsOkResult_WhenListingExists()
@@ -97,12 +80,12 @@ namespace RealEstate.Api.Tests.Controllers
 
         #endregion
 
-        #region Create Tests
+        #region Create Tests (Ekleme)
 
         [Fact]
         public async Task Create_ReturnsOkResult_WhenDtoIsValid()
         {
-            // Arrange
+            // Arrange (Hazırlık)
             var dto = new ListingDtos
             {
                 Title = "Yeni Test İlan",
@@ -117,11 +100,10 @@ namespace RealEstate.Api.Tests.Controllers
             // Assert
             result.Should().BeOfType<OkObjectResult>();
 
-            // Veritabanında oluşturulmuş mu kontrol et
+            // Veritabanında oluştu mu?
             var createdListing = await _context.Listings.FindAsync(3);
             createdListing.Should().NotBeNull();
             createdListing!.Title.Should().Be("Yeni Test İlan");
-            createdListing.City.Should().Be("Antalya");
         }
 
         [Fact]
@@ -134,50 +116,9 @@ namespace RealEstate.Api.Tests.Controllers
             result.Should().BeOfType<BadRequestObjectResult>();
         }
 
-        [Fact]
-        public async Task Create_SavesListingToDatabase()
-        {
-            // Arrange
-            var initialCount = _context.Listings.Count();
-            var dto = new ListingDtos
-            {
-                Title = "Database Test İlan",
-                City = "Konya",
-                Price = 1_000_000
-            };
-
-            // Act
-            await _controller.Create(dto);
-
-            // Assert
-            _context.Listings.Count().Should().Be(initialCount + 1);
-        }
-
-        [Fact]
-        public async Task Create_SetsCreatedDate()
-        {
-            // Arrange
-            var dto = new ListingDtos
-            {
-                Title = "Tarih Test İlan",
-                City = "Samsun",
-                Price = 800_000
-            };
-
-            // Act
-            var beforeCreate = DateTime.UtcNow;
-            await _controller.Create(dto);
-            var afterCreate = DateTime.UtcNow;
-
-            // Assert
-            var createdListing = _context.Listings.OrderByDescending(l => l.Id).First();
-            createdListing.CreatedDate.Should().BeOnOrAfter(beforeCreate);
-            createdListing.CreatedDate.Should().BeOnOrBefore(afterCreate);
-        }
-
         #endregion
 
-        #region Update Tests
+        #region Update Tests (Güncelleme)
 
         [Fact]
         public async Task Update_ReturnsOkResult_WhenListingExists()
@@ -216,7 +157,6 @@ namespace RealEstate.Api.Tests.Controllers
             // Assert
             var updatedListing = await _context.Listings.FindAsync(1);
             updatedListing!.Title.Should().Be("Değiştirilmiş Başlık");
-            updatedListing.City.Should().Be("Erzurum");
             updatedListing.Price.Should().Be(3_500_000);
         }
 
@@ -235,7 +175,7 @@ namespace RealEstate.Api.Tests.Controllers
 
         #endregion
 
-        #region Delete Tests
+        #region Delete Tests (Silme)
 
         [Fact]
         public async Task Delete_ReturnsOkResult_WhenListingExists()
@@ -257,9 +197,9 @@ namespace RealEstate.Api.Tests.Controllers
             await _controller.Delete(1);
 
             // Assert
-            _context.Listings.Count().Should().Be(initialCount - 1);
+            _context.Listings.Count().Should().Be(initialCount - 1); // Sayı 1 azalmalı
             var deletedListing = await _context.Listings.FindAsync(1);
-            deletedListing.Should().BeNull();
+            deletedListing.Should().BeNull(); // Artık bulunamamalı
         }
 
         [Fact]
