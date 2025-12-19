@@ -29,5 +29,13 @@ namespace RealEstate.Api.Controllers
             return Unauthorized(new { message = "Invalid email or password." });
         }
 
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            return Ok(new
+            {
+                message = "Logout successful."
+            });
+        }
     }
 }

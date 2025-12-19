@@ -1,4 +1,7 @@
-@RealEstate_Api_HostAddress = http://localhost:5180
+@RealEstate_Api_HostAddress = https://localhost:7180
+
+
+
 
 ### LOGIN - SUCCESS
 POST {{RealEstate_Api_HostAddress}}/api/auth/login
@@ -32,4 +35,15 @@ Accept: application/json
 {
   "email": "",
   "password": ""
-}D
+}
+
+###
+
+### LOGIN - FAIL - NULL BODY
+POST {{RealEstate_Api_HostAddress}}/api/auth/login
+Accept: application/json
+Content-Type: application/json
+
+### LOGOUT - SUCCESS
+POST {{RealEstate_Api_HostAddress}}/api/Auth/logout
+Accept: application/json
