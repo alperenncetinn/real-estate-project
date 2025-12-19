@@ -1,6 +1,35 @@
-@RealEstate.Api_HostAddress = http://localhost:5180
+@RealEstate_Api_HostAddress = http://localhost:5180
 
-GET {{RealEstate.Api_HostAddress}}/weatherforecast/
+### LOGIN - SUCCESS
+POST {{RealEstate_Api_HostAddress}}/api/auth/login
+Content-Type: application/json
 Accept: application/json
 
+{
+  "email": "test@test.com",
+  "password": "123456"
+}
+
 ###
+
+### LOGIN - FAIL - WRONG PASSWORD
+POST {{RealEstate_Api_HostAddress}}/api/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "test@test.com",
+  "password": "000000"
+}
+
+###
+
+### LOGIN - FAIL - MISSING FIELDS
+POST {{RealEstate_Api_HostAddress}}/api/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "",
+  "password": ""
+}D
