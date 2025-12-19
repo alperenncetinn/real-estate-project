@@ -1,0 +1,10 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Hata";
+}
+
+<div class="container" style="padding:80px 0;">
+    <h1>Bir hata oluştu</h1>
+    <p>@ViewBag.ExceptionMessage ?? "Beklenmeyen bir hata meydana geldi."</p>
+    <a class="btn btn-secondary" asp-controller="Home" asp-action="Index">Anasayfa'ya Dön</a>
+</div>

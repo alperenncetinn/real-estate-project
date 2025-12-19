@@ -1,0 +1,11 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Sayfa Bulunamadı";
+}
+
+<div class="container text-center" style="padding:80px 0;">
+    <h1 class="display-4">404</h1>
+    <p class="lead">Aradığınız sayfa bulunamadı.</p>
+    <p>URL yanlış ya da sayfa taşınmış olabilir. Anasayfaya dönmek için aşağıdaki butonu kullanabilirsiniz.</p>
+    <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Anasayfa'ya Dön</a>
+</div>

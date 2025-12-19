@@ -1,0 +1,11 @@
+@* Shared error overlay partial *@
+<div id="errorOverlay" class="app-error-overlay" aria-hidden="true" style="display:none;">
+    <div class="app-error-box" role="alert">
+        <button type="button" class="btn-close app-error-close" aria-label="Kapat" onclick="hideError()"></button>
+        <h5 class="app-error-title">Bir hata oluştu</h5>
+        <p id="errorMessage" class="app-error-message">Bilinmeyen bir hata. Lütfen tekrar deneyin.</p>
+        <div class="text-end">
+            <button class="btn btn-secondary" onclick="hideError()">Kapat</button>
+        </div>
+    </div>
+</div>
