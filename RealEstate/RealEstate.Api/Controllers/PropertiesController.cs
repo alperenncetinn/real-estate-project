@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using RealEstate.Api.Data;
 using RealEstate.Api.Models;
 
 namespace RealEstate.Api.Controllers
@@ -11,39 +13,12 @@ namespace RealEstate.Api.Controllers
     public class PropertiesController : ControllerBase
     {
         private readonly ILogger<PropertiesController> _logger;
+        private readonly ApplicationDbContext _context;
 
-        // In-memory veri deposu (uygulama yeniden başlatılana kadar kalıcı)
-        private static List<Property> _properties = new List<Property>
-        {
-            new Property
-            {
-                Id = 1,
-                Title = "Merkezde 2+1 Daire",
-                City = "Manisa",
-                District = "Yunusemre",
-                Price = 2_500_000,
-                RoomCount = 2,
-                Area = 110,
-                ImageUrl = "https://placehold.co/600x400?text=House+1"
-            },
-            new Property
-            {
-                Id = 2,
-                Title = "Site İçinde 3+1 Daire",
-                City = "İzmir",
-                District = "Bornova",
-                Price = 4_100_000,
-                RoomCount = 3,
-                Area = 140,
-                ImageUrl = "https://placehold.co/600x400?text=House+2"
-            }
-        };
-
-        private static int _nextId = 3;
-
-        public PropertiesController(ILogger<PropertiesController> logger)
+        public PropertiesController(ILogger<PropertiesController> logger, ApplicationDbContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
         /// <summary>
@@ -51,10 +26,27 @@ namespace RealEstate.Api.Controllers
         /// </summary>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<IEnumerable<Property>> GetAll()
+        public async Task<ActionResult<IEnumerable<Property>>> GetAll()
         {
-            _logger.LogInformation("Toplam {Count} ilan getirildi.", _properties.Count);
-            return Ok(_properties);
+            var properties = await _context.Properties.ToListAsync();
+            _logger.LogInformation("Toplam {Count} ilan getirildi.", properties.Count);
+            return Ok(properties);
+        }
+
+        /// <summary>
+        /// ID ile tek bir ilan getirir.
+        /// </summary>
+        [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<Property>> GetById(int id)
+        {
+            var property = await _context.Properties.FindAsync(id);
+            if (property == null)
+            {
+                return NotFound("İlan bulunamadı.");
+            }
+            return Ok(property);
         }
 
         /// <summary>
@@ -62,11 +54,10 @@ namespace RealEstate.Api.Controllers
         /// </summary>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public ActionResult<Property> Create([FromForm] PropertyCreateDto dto)
+        public async Task<ActionResult<Property>> Create([FromForm] PropertyCreateDto dto)
         {
             var property = new Property
             {
-                Id = _nextId++,
                 Title = dto.Title ?? "Başlıksız İlan",
                 City = dto.City ?? "Belirtilmedi",
                 District = dto.District ?? "",
@@ -76,10 +67,62 @@ namespace RealEstate.Api.Controllers
                 ImageUrl = "https://placehold.co/600x400?text=Yeni+Ilan"
             };
 
-            _properties.Add(property);
+            _context.Properties.Add(property);
+            await _context.SaveChangesAsync();
+
             _logger.LogInformation("Yeni ilan eklendi: {Title}", property.Title);
 
-            return CreatedAtAction(nameof(GetAll), new { id = property.Id }, property);
+            return CreatedAtAction(nameof(GetById), new { id = property.Id }, property);
+        }
+
+        /// <summary>
+        /// Mevcut bir ilanı günceller.
+        /// </summary>
+        [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<Property>> Update(int id, [FromForm] PropertyCreateDto dto)
+        {
+            var property = await _context.Properties.FindAsync(id);
+            if (property == null)
+            {
+                return NotFound("İlan bulunamadı.");
+            }
+
+            property.Title = dto.Title ?? property.Title;
+            property.City = dto.City ?? property.City;
+            property.District = dto.District ?? property.District;
+            property.Price = dto.Price;
+            property.RoomCount = ParseRoomCount(dto.RoomCount);
+            property.Area = dto.SquareMeters;
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("İlan güncellendi: {Title}", property.Title);
+
+            return Ok(property);
+        }
+
+        /// <summary>
+        /// Bir ilanı siler.
+        /// </summary>
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var property = await _context.Properties.FindAsync(id);
+            if (property == null)
+            {
+                return NotFound("İlan bulunamadı.");
+            }
+
+            _context.Properties.Remove(property);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("İlan silindi: {Id}", id);
+
+            return Ok(new { message = $"ID'si {id} olan ilan silindi." });
         }
 
         private int ParseRoomCount(string? roomCount)

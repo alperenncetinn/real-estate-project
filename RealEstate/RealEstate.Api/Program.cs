@@ -1,8 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+using RealEstate.Api.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+// EF Core - SQLite yapılandırması
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // CORS yapılandırması - RealEstate.Web'in API'ye erişmesine izin ver
 builder.Services.AddCors(options =>
@@ -20,6 +27,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+// Veritabanını otomatik oluştur ve migrate et
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.EnsureCreated();
+}
 
 app.UseStaticFiles(); // Bu satır olmazsa resimler 404 hatası verir (açılmaz).
 

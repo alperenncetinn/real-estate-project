@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using RealEstate.Api.Data;
 using RealEstate.Api.Dtos;
+using RealEstate.Api.Entities;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -13,32 +16,33 @@ namespace RealEstate.Api.Controllers
     [ApiController]
     public class ListingsController : ControllerBase
     {
-        // RAM'deki Sahte Veritabanı
-        private static List<ListingDtos> _listings = new List<ListingDtos>();
-
+        private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _environment;
 
-        public ListingsController(IWebHostEnvironment environment)
+        public ListingsController(ApplicationDbContext context, IWebHostEnvironment environment)
         {
+            _context = context;
             _environment = environment;
         }
 
         // 1. LİSTELEME (GET)
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return Ok(_listings);
+            var listings = await _context.Listings.ToListAsync();
+            return Ok(listings);
         }
 
         // 2. ID İLE GETİRME (GET BY ID) - Düzenleme sayfası için gerekli
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            if (id < 0 || id >= _listings.Count)
+            var listing = await _context.Listings.FindAsync(id);
+            if (listing == null)
             {
                 return NotFound("İlan bulunamadı.");
             }
-            return Ok(_listings[id]);
+            return Ok(listing);
         }
 
         // 3. EKLEME (POST)
@@ -46,6 +50,15 @@ namespace RealEstate.Api.Controllers
         public async Task<IActionResult> Create([FromForm] ListingDtos dto)
         {
             if (dto == null) return BadRequest("Veri gelmedi.");
+
+            var listing = new Listing
+            {
+                Title = dto.Title,
+                Description = dto.Description,
+                City = dto.City,
+                Price = dto.Price,
+                CreatedDate = DateTime.UtcNow
+            };
 
             // FOTOĞRAF YÜKLEME
             if (dto.Photo != null && dto.Photo.Length > 0)
@@ -61,27 +74,31 @@ namespace RealEstate.Api.Controllers
                 {
                     await dto.Photo.CopyToAsync(stream);
                 }
-                dto.ImageUrl = "/uploads/" + fileName;
+                listing.ImageUrl = "/uploads/" + fileName;
             }
 
-            _listings.Add(dto);
-            return Ok(new { message = "İlan oluşturuldu", data = dto });
+            _context.Listings.Add(listing);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "İlan oluşturuldu", data = listing });
         }
 
-        // 4. GÜNCELLEME (PUT) - BU KISIM GÜNCELLENDİ
+        // 4. GÜNCELLEME (PUT)
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromForm] ListingDtos dto)
         {
-            // İlan var mı kontrol et
-            if (id < 0 || id >= _listings.Count) return NotFound();
+            var existingListing = await _context.Listings.FindAsync(id);
+            if (existingListing == null) return NotFound();
 
-            // Eski ilanı al (Eski resim yolunu kaybetmemek için)
-            var existingListing = _listings[id];
+            // Alanları güncelle
+            existingListing.Title = dto.Title;
+            existingListing.Description = dto.Description;
+            existingListing.City = dto.City;
+            existingListing.Price = dto.Price;
 
             // --- YENİ FOTOĞRAF VAR MI? ---
             if (dto.Photo != null && dto.Photo.Length > 0)
             {
-                // Varsa yeni fotoğrafı kaydet (Create ile aynı mantık)
                 var fileName = Guid.NewGuid().ToString() + Path.GetExtension(dto.Photo.FileName);
                 var uploadPath = Path.Combine(_environment.WebRootPath ?? _environment.ContentRootPath, "uploads");
 
@@ -93,30 +110,25 @@ namespace RealEstate.Api.Controllers
                 {
                     await dto.Photo.CopyToAsync(stream);
                 }
-                
-                // Yeni resim yolunu ata
-                dto.ImageUrl = "/uploads/" + fileName;
-            }
-            else
-            {
-                // Yeni fotoğraf yoksa, ESKİ FOTOĞRAFI KORU
-                dto.ImageUrl = existingListing.ImageUrl;
-            }
-            // -----------------------------
 
-            // Listeyi güncelle
-            _listings[id] = dto;
+                existingListing.ImageUrl = "/uploads/" + fileName;
+            }
+            // Yeni fotoğraf yoksa, ESKİ FOTOĞRAF KORUNUR
 
-            return Ok(new { message = $"ID'si {id} olan ilan güncellendi.", data = dto });
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = $"ID'si {id} olan ilan güncellendi.", data = existingListing });
         }
 
         // 5. SİLME (DELETE)
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id < 0 || id >= _listings.Count) return NotFound();
+            var listing = await _context.Listings.FindAsync(id);
+            if (listing == null) return NotFound();
 
-            _listings.RemoveAt(id);
+            _context.Listings.Remove(listing);
+            await _context.SaveChangesAsync();
 
             return Ok(new { message = $"ID'si {id} olan ilan silindi." });
         }
