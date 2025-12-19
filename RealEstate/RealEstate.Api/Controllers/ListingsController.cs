@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.IO;
+using System.Linq; // Query işlemleri için gerekli
 using System.Threading.Tasks;
 
 namespace RealEstate.Api.Controllers
@@ -25,15 +26,25 @@ namespace RealEstate.Api.Controllers
             _environment = environment;
         }
 
-        // 1. LİSTELEME (GET)
+        // 1. LİSTELEME (GET) - FİLTRELEME EKLENDİ
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] string? type = null)
         {
-            var listings = await _context.Listings.ToListAsync();
+            // Sorguyu oluşturmaya başlıyoruz (Hemen veritabanına gitmiyoruz)
+            var query = _context.Listings.AsQueryable();
+
+            // Eğer URL'den ?type=Kiralık gibi bir bilgi geldiyse filtrele
+            if (!string.IsNullOrEmpty(type))
+            {
+                query = query.Where(x => x.Type == type);
+            }
+
+            // Sorguyu çalıştır ve listeyi getir
+            var listings = await query.ToListAsync();
             return Ok(listings);
         }
 
-        // 2. ID İLE GETİRME (GET BY ID) - Düzenleme sayfası için gerekli
+        // 2. ID İLE GETİRME (GET BY ID)
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -45,7 +56,7 @@ namespace RealEstate.Api.Controllers
             return Ok(listing);
         }
 
-        // 3. EKLEME (POST)
+        // 3. EKLEME (POST) - TYPE EKLENDİ
         [HttpPost]
         public async Task<IActionResult> Create([FromForm] ListingDtos dto)
         {
@@ -57,6 +68,7 @@ namespace RealEstate.Api.Controllers
                 Description = dto.Description,
                 City = dto.City,
                 Price = dto.Price,
+                Type = dto.Type, // <-- YENİ EKLENEN: Tür bilgisi kaydediliyor
                 CreatedDate = DateTime.UtcNow
             };
 
@@ -83,7 +95,7 @@ namespace RealEstate.Api.Controllers
             return Ok(new { message = "İlan oluşturuldu", data = listing });
         }
 
-        // 4. GÜNCELLEME (PUT)
+        // 4. GÜNCELLEME (PUT) - TYPE EKLENDİ
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromForm] ListingDtos dto)
         {
@@ -95,6 +107,7 @@ namespace RealEstate.Api.Controllers
             existingListing.Description = dto.Description;
             existingListing.City = dto.City;
             existingListing.Price = dto.Price;
+            existingListing.Type = dto.Type; // <-- YENİ EKLENEN: Tür bilgisi güncelleniyor
 
             // --- YENİ FOTOĞRAF VAR MI? ---
             if (dto.Photo != null && dto.Photo.Length > 0)

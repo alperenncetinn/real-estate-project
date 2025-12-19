@@ -17,18 +17,25 @@ namespace RealEstate.Web.Services
         }
 
         // --- 1. LİSTELEME (Tümünü Getir) ---
-        public async Task<List<ListingViewModel>> GetAllListingsAsync()
+        // GÜNCELLENDİ: 'type' parametresi alarak filtreleme yapıyor
+        public async Task<List<ListingViewModel>> GetAllListingsAsync(string? type = null)
         {
+            // URL'yi dinamik oluşturuyoruz
+            var url = "api/listings";
+            
+            // Eğer bir tür seçildiyse (Kiralık/Satılık), URL'nin sonuna ekle
+            if (!string.IsNullOrEmpty(type))
+            {
+                url += $"?type={type}";
+            }
+
             // Eğer null gelirse boş liste ver
-            return await _httpClient.GetFromJsonAsync<List<ListingViewModel>>("api/listings") ?? new List<ListingViewModel>();
+            return await _httpClient.GetFromJsonAsync<List<ListingViewModel>>(url) ?? new List<ListingViewModel>();
         }
 
         // --- 2. TEK İLAN GETİR (Düzenleme Sayfası İçin) ---
         public async Task<ListingViewModel> GetListingByIdAsync(int id)
         {
-            // DÜZELTME BURADA: 
-            // Eğer API null dönerse (bulamazsa), boş bir ListingViewModel oluşturup veriyoruz.
-            // Böylece "Null Reference" hatası vermez.
             return await _httpClient.GetFromJsonAsync<ListingViewModel>($"api/listings/{id}") ?? new ListingViewModel();
         }
 
@@ -40,6 +47,10 @@ namespace RealEstate.Web.Services
             content.Add(new StringContent(model.Title ?? string.Empty), "Title");
             content.Add(new StringContent(model.City ?? string.Empty), "City");
             content.Add(new StringContent(model.Price.ToString()), "Price");
+
+            // --- YENİ EKLENEN: Type (Satılık/Kiralık) bilgisini gönderiyoruz ---
+            content.Add(new StringContent(model.Type ?? string.Empty), "Type");
+            // ------------------------------------------------------------------
 
             // DTO'da varsa ekle, yoksa boş geç
             content.Add(new StringContent(model.RoomCount ?? string.Empty), "RoomCount");
@@ -66,6 +77,11 @@ namespace RealEstate.Web.Services
             content.Add(new StringContent(model.Title ?? string.Empty), "Title");
             content.Add(new StringContent(model.City ?? string.Empty), "City");
             content.Add(new StringContent(model.Price.ToString()), "Price");
+            
+            // --- YENİ EKLENEN: Type (Satılık/Kiralık) bilgisini gönderiyoruz ---
+            content.Add(new StringContent(model.Type ?? string.Empty), "Type");
+            // ------------------------------------------------------------------
+
             content.Add(new StringContent(model.Description ?? string.Empty), "Description");
 
             if (model.Photo != null)

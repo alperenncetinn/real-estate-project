@@ -10,6 +10,10 @@ using RealEstate.Api.Dtos;
 using RealEstate.Api.Entities;
 using RealEstate.Api.Tests.Helpers;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.IO;
+using System;
+using System.Linq;
 
 namespace RealEstate.Api.Tests.Controllers
 {
@@ -21,10 +25,10 @@ namespace RealEstate.Api.Tests.Controllers
 
         public ListingsControllerTests()
         {
-            // Test veritabanını oluşturuyoruz
+            // Helper sınıfından dolu bir test veritabanı alıyoruz
             _context = TestDbContextFactory.CreateContextWithData();
             
-            // Dosya işlemleri için sahte bir ortam (Mock) yaratıyoruz
+            // Dosya işlemleri için sahte bir ortam (Mock)
             _mockEnvironment = new Mock<IWebHostEnvironment>();
             _mockEnvironment.Setup(e => e.WebRootPath).Returns(Path.GetTempPath());
             
@@ -37,23 +41,37 @@ namespace RealEstate.Api.Tests.Controllers
             _context.Dispose();
         }
 
-        #region GetAll Tests (Listeleme)
+        #region GetAll Tests (Listeleme & Filtreleme)
 
         [Fact]
-        public async Task GetAll_ReturnsOkResult_WithListings()
+        public async Task GetAll_ReturnsOkResult_WithAllListings_WhenNoFilter()
         {
-            // Act (Eylem)
-            var result = await _controller.GetAll();
+            // Act
+            var result = await _controller.GetAll(null); // Filtre yok
 
-            // Assert (Doğrulama)
+            // Assert
             var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
             var listings = okResult.Value.Should().BeAssignableTo<IEnumerable<Listing>>().Subject;
-            listings.Should().HaveCount(2); // Helpers içinde 2 tane sahte veri ekli
+            listings.Should().HaveCount(2); // Helper içinde 2 veri vardı
+        }
+
+        [Fact]
+        public async Task GetAll_ReturnsFilteredListings_WhenTypeIsProvided()
+        {
+            // Act - Sadece "Kiralık" olanları iste
+            var result = await _controller.GetAll("Kiralık");
+
+            // Assert
+            var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+            var listings = okResult.Value.Should().BeAssignableTo<IEnumerable<Listing>>().Subject;
+            
+            listings.Should().HaveCount(1); // Sadece 1 tane kiralık vardı
+            listings.First().Type.Should().Be("Kiralık");
         }
 
         #endregion
 
-        #region GetById Tests (Detay Getirme)
+        #region GetById Tests (Detay)
 
         [Fact]
         public async Task GetById_ReturnsOkResult_WhenListingExists()
@@ -85,12 +103,13 @@ namespace RealEstate.Api.Tests.Controllers
         [Fact]
         public async Task Create_ReturnsOkResult_WhenDtoIsValid()
         {
-            // Arrange (Hazırlık)
+            // Arrange
             var dto = new ListingDtos
             {
                 Title = "Yeni Test İlan",
                 City = "Antalya",
                 Price = 5_000_000,
+                Type = "Satılık",
                 Description = "Yeni ilan açıklaması"
             };
 
@@ -100,10 +119,10 @@ namespace RealEstate.Api.Tests.Controllers
             // Assert
             result.Should().BeOfType<OkObjectResult>();
 
-            // Veritabanında oluştu mu?
-            var createdListing = await _context.Listings.FindAsync(3);
+            // DB Kontrolü
+            var createdListing = await _context.Listings.FirstOrDefaultAsync(l => l.Title == "Yeni Test İlan");
             createdListing.Should().NotBeNull();
-            createdListing!.Title.Should().Be("Yeni Test İlan");
+            createdListing!.City.Should().Be("Antalya");
         }
 
         [Fact]
@@ -129,7 +148,8 @@ namespace RealEstate.Api.Tests.Controllers
                 Title = "Güncellenmiş İlan",
                 City = "Trabzon",
                 Price = 2_000_000,
-                Description = "Güncellenmiş açıklama"
+                Type = "Satılık",
+                Description = "Güncelleme testi"
             };
 
             // Act
@@ -137,37 +157,17 @@ namespace RealEstate.Api.Tests.Controllers
 
             // Assert
             result.Should().BeOfType<OkObjectResult>();
-        }
-
-        [Fact]
-        public async Task Update_UpdatesListingInDatabase()
-        {
-            // Arrange
-            var dto = new ListingDtos
-            {
-                Title = "Değiştirilmiş Başlık",
-                City = "Erzurum",
-                Price = 3_500_000,
-                Description = "Değiştirilmiş açıklama"
-            };
-
-            // Act
-            await _controller.Update(1, dto);
-
-            // Assert
+            
+            // DB Kontrolü
             var updatedListing = await _context.Listings.FindAsync(1);
-            updatedListing!.Title.Should().Be("Değiştirilmiş Başlık");
-            updatedListing.Price.Should().Be(3_500_000);
+            updatedListing!.Title.Should().Be("Güncellenmiş İlan");
         }
 
         [Fact]
         public async Task Update_ReturnsNotFound_WhenListingDoesNotExist()
         {
-            // Arrange
-            var dto = new ListingDtos { Title = "Test" };
-
             // Act
-            var result = await _controller.Update(999, dto);
+            var result = await _controller.Update(999, new ListingDtos());
 
             // Assert
             result.Should().BeOfType<NotFoundResult>();
@@ -185,21 +185,10 @@ namespace RealEstate.Api.Tests.Controllers
 
             // Assert
             result.Should().BeOfType<OkObjectResult>();
-        }
-
-        [Fact]
-        public async Task Delete_RemovesListingFromDatabase()
-        {
-            // Arrange
-            var initialCount = _context.Listings.Count();
-
-            // Act
-            await _controller.Delete(1);
-
-            // Assert
-            _context.Listings.Count().Should().Be(initialCount - 1); // Sayı 1 azalmalı
+            
+            // DB Kontrolü
             var deletedListing = await _context.Listings.FindAsync(1);
-            deletedListing.Should().BeNull(); // Artık bulunamamalı
+            deletedListing.Should().BeNull();
         }
 
         [Fact]

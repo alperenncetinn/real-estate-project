@@ -10,7 +10,6 @@ namespace RealEstate.Web.Controllers
     {
         private readonly ApiService _apiService;
 
-        // Dependency Injection: ApiService'i buradan alıyoruz
         public ListingController(ApiService apiService)
         {
             _apiService = apiService;
@@ -18,10 +17,14 @@ namespace RealEstate.Web.Controllers
 
         // --- 1. LİSTELEME (INDEX) ---
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? type) // <-- DEĞİŞİKLİK: Parametre eklendi
         {
-            // API'den tüm ilanları çekip ekrana gönderiyoruz
-            var values = await _apiService.GetAllListingsAsync();
+            // Gelen type bilgisini (Kiralık/Satılık) servise gönderiyoruz
+            var values = await _apiService.GetAllListingsAsync(type);
+            
+            // Eğer filtre varsa sayfada göstermek için ViewBag'e atabiliriz (Opsiyonel)
+            ViewBag.CurrentType = type;
+
             return View(values);
         }
 
@@ -36,18 +39,15 @@ namespace RealEstate.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateListingViewModel model)
         {
-            // Zorunlu alanlar doldurulmuş mu?
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-            // Veriyi servise gönder
             bool result = await _apiService.CreateListingAsync(model);
 
             if (result)
             {
-                // Başarılıysa listeye dön
                 return RedirectToAction("Index");
             }
 
@@ -58,19 +58,23 @@ namespace RealEstate.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            // Düzenlenecek ilanın mevcut bilgilerini getir
             var value = await _apiService.GetListingByIdAsync(id);
 
-            // Gelen veriyi formun anlayacağı modele çeviriyoruz
+            // Gelen veriyi forma dolduruyoruz
             var model = new CreateListingViewModel
             {
                 Title = value.Title,
                 City = value.City,
                 Price = value.Price,
-                Description = value.Description
+                Description = value.Description,
+
+                // --- EKLENEN KISIMLAR ---
+                Type = value.Type,             // <-- ÖNEMLİ: Radyo butonu doğru seçilsin
+                RoomCount = value.RoomCount,   // <-- Diğer eksik bilgiler
+                SquareMeters = value.SquareMeters
+                // -------------------------
             };
 
-            // ID'yi ve mevcut resmi sayfada kullanmak için ViewBag'e atıyoruz
             ViewBag.Id = id;
             ViewBag.CurrentImage = value.ImageUrl;
 
@@ -83,10 +87,11 @@ namespace RealEstate.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
+                // Hata durumunda resmi tekrar göstermek için
+                ViewBag.Id = id;
                 return View(model);
             }
 
-            // Güncelleme isteğini servise gönder
             bool result = await _apiService.UpdateListingAsync(id, model);
 
             if (result)
@@ -98,7 +103,7 @@ namespace RealEstate.Web.Controllers
         }
 
         // --- 6. SİLME İŞLEMİ (DELETE) ---
-        [HttpPost]
+        // Not: Index sayfasında <a> etiketi kullandığımız için HttpPost'u kaldırdık veya HttpGet yaptık.
         public async Task<IActionResult> Delete(int id)
         {
             await _apiService.DeleteListingAsync(id);

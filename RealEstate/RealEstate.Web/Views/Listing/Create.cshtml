@@ -37,6 +37,24 @@
                     </div>
                 </div>
 
+                <div class="mb-3">
+                    <label class="form-label fw-bold">İlan Türü</label>
+                    <div class="d-flex gap-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" asp-for="Type" value="Satılık" id="typeSale" checked>
+                            <label class="form-check-label" for="typeSale">
+                                🏠 Satılık
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" asp-for="Type" value="Kiralık" id="typeRent">
+                            <label class="form-check-label" for="typeRent">
+                                🔑 Kiralık
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Oda Sayısı</label>
