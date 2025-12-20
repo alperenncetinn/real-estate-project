@@ -5,6 +5,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// HttpContextAccessor for accessing cookies in services
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddHttpClient<RealEstate.Web.Services.ApiService>();
 
 // API Client konfigürasyonu
@@ -19,6 +22,20 @@ builder.Services.AddHttpClient<RealEstate.Web.Services.ApiService>(client =>
 {
     // Buradaki adres senin API'nin çalıştığı port olmalı (5180)
     client.BaseAddress = new Uri(apiBaseUrl);
+});
+
+// Auth Service
+builder.Services.AddHttpClient<AuthService>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+});
+
+// Notification Service
+builder.Services.AddHttpClient<NotificationService>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 
 var app = builder.Build();

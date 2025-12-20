@@ -1,0 +1,84 @@
+@inject RealEstate.Web.Services.AuthService AuthService
+@inject RealEstate.Web.Services.NotificationService NotificationService
+@{
+    var isAuthenticated = AuthService.IsAuthenticated();
+    List<RealEstate.Web.Services.NotificationDto> unreadNotifications = new();
+
+    if (isAuthenticated)
+    {
+        unreadNotifications = await NotificationService.GetNotificationsAsync(unreadOnly: true);
+    }
+}
+
+@if (isAuthenticated && unreadNotifications.Any())
+{
+    <!-- Bildirim Modal -->
+    <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="notificationModalLabel">
+                        Yeni Bildirimleriniz Var!
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    @foreach (var notification in unreadNotifications.Take(5))
+                    {
+                        var alertClass = notification.Type switch
+                        {
+                                        "warning" => "alert-warning",
+                                        "success" => "alert-success",
+                                        "error" => "alert-danger",
+                            _ => "alert-info"
+                        };
+
+                        <div class="alert @alertClass mb-2">
+                            <h6 class="alert-heading mb-1">@notification.Title</h6>
+                            <p class="mb-1 small">@notification.Message</p>
+                            <small class="text-muted">@notification.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</small>
+                            @if (notification.ListingId.HasValue)
+                            {
+                                <div class="mt-2">
+                                    <a href="/Listing/Details/@notification.ListingId" class="btn btn-sm btn-outline-secondary">
+                                        Ilana Git
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    @if (unreadNotifications.Count > 5)
+                    {
+                        <div class="text-center text-muted">
+                            <small>ve @(unreadNotifications.Count - 5) bildirim daha...</small>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    <button type="button" class="btn btn-primary" onclick="markAllAndClose()">Tumunu Okundu
+                        Isaretle</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Modal'ı otomatik göster
+            var notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
+            notificationModal.show();
+        });
+
+        async function markAllAndClose() {
+            await fetch('/Notification/MarkAllAsRead', { method: 'POST' });
+            var modal = bootstrap.Modal.getInstance(document.getElementById('notificationModal'));
+            modal.hide();
+            // Badge'i güncelle
+            const badge = document.querySelector('#notificationDropdown .badge');
+            if (badge) badge.remove();
+        }
+    </script>
+}

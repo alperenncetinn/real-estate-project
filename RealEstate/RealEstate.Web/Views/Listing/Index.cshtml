@@ -1,11 +1,14 @@
 @model List<RealEstate.Web.Models.ListingViewModel>
+@inject RealEstate.Web.Services.AuthService AuthService
 
 @{
     ViewData["Title"] = "İlanlar";
+    var currentUser = AuthService.GetCurrentUser();
+    var isAdmin = currentUser?.Role == "Admin";
 }
 
 <div class="container mt-5">
-    
+
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>🏡 Emlak İlanları</h2>
         <a asp-action="Create" class="btn btn-success">+ Yeni İlan Ekle</a>
@@ -16,7 +19,7 @@
         <a asp-action="Index" asp-route-type="Satılık" class="btn btn-outline-danger">🏠 Satılık</a>
         <a asp-action="Index" asp-route-type="Kiralık" class="btn btn-outline-warning text-dark">🔑 Kiralık</a>
     </div>
-    
+
     <hr />
 
     @if (Model == null || Model.Count == 0)
@@ -33,14 +36,16 @@
             {
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 shadow-sm">
-                        
+
                         @if (!string.IsNullOrEmpty(item.ImageUrl))
                         {
-                            <img src="@item.ImageUrl" class="card-img-top" alt="@item.Title" style="height: 200px; object-fit: cover;">
+                            <img src="@item.ImageUrl" class="card-img-top" alt="@item.Title"
+                                style="height: 200px; object-fit: cover;">
                         }
                         else
                         {
-                            <img src="https://via.placeholder.com/300x200?text=Resim+Yok" class="card-img-top" style="height: 200px; object-fit: cover;">
+                            <img src="https://via.placeholder.com/300x200?text=Resim+Yok" class="card-img-top"
+                                style="height: 200px; object-fit: cover;">
                         }
 
                         <div class="card-body">
@@ -52,17 +57,21 @@
                             <h6 class="card-subtitle mb-2 text-muted">📍 @item.City</h6>
                             <p class="card-text text-truncate">@item.Description</p>
                             <h4 class="text-primary mt-3">@item.Price.ToString("C0")</h4>
-                            
-                            <hr />
-                            
-                            <div class="d-flex justify-content-between">
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Düzenle ✏️</a>
 
-                                <a asp-action="Delete" asp-route-id="@item.Id" 
-                                   class="btn btn-danger btn-sm"
-                                   onclick="return confirm('Bu ilanı silmek istediğine emin misin?');">
-                                   Sil 🗑️
-                                </a>
+                            <hr />
+
+                            <div class="d-flex justify-content-between">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Detay 👁️</a>
+
+                                @if (isAdmin || (currentUser != null && item.UserId.HasValue && item.UserId == currentUser.Id))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Düzenle ✏️</a>
+
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Bu ilanı silmek istediğine emin misin?');">
+                                        Sil 🗑️
+                                    </a>
+                                }
                             </div>
                         </div>
                     </div>

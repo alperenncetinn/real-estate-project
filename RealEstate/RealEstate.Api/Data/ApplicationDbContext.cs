@@ -13,10 +13,24 @@ namespace RealEstate.Api.Data
 
         public DbSet<Listing> Listings { get; set; } = null!;
         public DbSet<Property> Properties { get; set; } = null!;
+        public DbSet<User> Users { get; set; } = null!;
+        public DbSet<Notification> Notifications { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // User entity konfigürasyonu
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Email).HasMaxLength(256).IsRequired();
+                entity.HasIndex(e => e.Email).IsUnique();
+                entity.Property(e => e.PasswordHash).IsRequired();
+                entity.Property(e => e.FirstName).HasMaxLength(100).IsRequired();
+                entity.Property(e => e.LastName).HasMaxLength(100).IsRequired();
+                entity.Property(e => e.Role).HasMaxLength(50).HasDefaultValue("User");
+            });
 
             // Listing entity konfigürasyonu
             modelBuilder.Entity<Listing>(entity =>
@@ -26,6 +40,37 @@ namespace RealEstate.Api.Data
                 entity.Property(e => e.City).HasMaxLength(100);
                 entity.Property(e => e.District).HasMaxLength(100);
                 entity.Property(e => e.Price).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.IsActive).HasDefaultValue(true);
+                entity.Property(e => e.DeactivationReason).HasMaxLength(500);
+
+                entity.HasOne(e => e.Owner)
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(e => e.DeactivatedBy)
+                    .WithMany()
+                    .HasForeignKey(e => e.DeactivatedByUserId)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // Notification entity konfigürasyonu
+            modelBuilder.Entity<Notification>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Title).HasMaxLength(200).IsRequired();
+                entity.Property(e => e.Message).HasMaxLength(1000).IsRequired();
+                entity.Property(e => e.Type).HasMaxLength(50).HasDefaultValue("info");
+
+                entity.HasOne(e => e.User)
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.Listing)
+                    .WithMany()
+                    .HasForeignKey(e => e.ListingId)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             // Property entity konfigürasyonu

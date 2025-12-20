@@ -35,7 +35,47 @@ cd ../RealEstate.Web
 dotnet restore
 ```
 
-### 3. Projeyi Derle
+### 3. Environment Ayarları (ÖNEMLİ - Güvenlik)
+
+Proje hassas bilgileri korumak için environment-based configuration kullanır.
+
+#### Development Ortamı
+
+Development ortamında `appsettings.Development.json` otomatik olarak kullanılır. Ek bir ayar gerekmez.
+
+#### Production Ortamı
+
+Production için aşağıdaki environment variable'ları ayarlayın:
+
+```bash
+# Linux/macOS
+export JwtSettings__SecretKey="YourSuperSecretKeyAtLeast32Characters!"
+export AdminSettings__DefaultAdminEmail="admin@yourdomain.com"
+export AdminSettings__DefaultAdminPassword="YourSecurePassword123!"
+
+# Windows PowerShell
+$env:JwtSettings__SecretKey="YourSuperSecretKeyAtLeast32Characters!"
+$env:AdminSettings__DefaultAdminEmail="admin@yourdomain.com"
+$env:AdminSettings__DefaultAdminPassword="YourSecurePassword123!"
+```
+
+**Veya** `appsettings.Production.json` dosyası oluşturun (bu dosya .gitignore'da):
+
+```json
+{
+  "JwtSettings": {
+    "SecretKey": "YourSuperSecretKeyAtLeast32Characters!"
+  },
+  "AdminSettings": {
+    "DefaultAdminEmail": "admin@yourdomain.com",
+    "DefaultAdminPassword": "YourSecurePassword123!"
+  }
+}
+```
+
+⚠️ **DİKKAT**: Secret key en az 32 karakter olmalıdır!
+
+### 4. Projeyi Derle
 
 ```bash
 cd ..

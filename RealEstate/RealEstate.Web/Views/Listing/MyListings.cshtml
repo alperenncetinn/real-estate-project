@@ -1,0 +1,113 @@
+@model List<RealEstate.Web.Models.ListingViewModel>
+@{
+    ViewData["Title"] = "Ilanlarim";
+}
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Ilanlarim</h2>
+        <a asp-action="Create" class="btn btn-primary">Yeni Ilan Ekle</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+        </div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            <h5>Henuz ilaniniz bulunmuyor.</h5>
+            <p>Yeni bir ilan eklemek icin yukardaki "Yeni Ilan Ekle" butonuna tiklayin.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Resim</th>
+                        <th>Baslik</th>
+                        <th>Sehir</th>
+                        <th>Fiyat</th>
+                        <th>Tur</th>
+                        <th>Durum</th>
+                        <th>Islemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr class="@(item.IsActive ? "" : "table-secondary")">
+                            <td style="width: 80px;">
+                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                {
+                                    <img src="http://localhost:5180@(item.ImageUrl)" alt="@item.Title"
+                                        style="width: 60px; height: 45px; object-fit: cover; border-radius: 4px;">
+                                }
+                                else
+                                {
+                                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center"
+                                        style="width: 60px; height: 45px; border-radius: 4px; font-size: 10px;">
+                                        Resim Yok
+                                    </div>
+                                }
+                            </td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="text-decoration-none">
+                                    @item.Title
+                                </a>
+                            </td>
+                            <td>@item.City</td>
+                            <td>@item.Price.ToString("N0") TL</td>
+                            <td>
+                                <span class="badge @(item.Type == "Satilik" ? "bg-success" : "bg-info")">
+                                    @item.Type
+                                </span>
+                            </td>
+                            <td>
+                                @if (item.IsActive)
+                                {
+                                    <span class="badge bg-success">Aktif</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Pasif</span>
+                                    @if (!string.IsNullOrEmpty(item.DeactivationReason))
+                                    {
+                                        <br>
+                                        <small class="text-muted">@item.DeactivationReason</small>
+                                    }
+                                }
+                            </td>
+                            <td>
+                                @if (item.IsActive)
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                        Duzenle
+                                    </a>
+                                }
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Bu ilani silmek istediginizden emin misiniz?')">
+                                    Sil
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
