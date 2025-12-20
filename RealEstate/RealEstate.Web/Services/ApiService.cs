@@ -14,7 +14,7 @@ namespace RealEstate.Web.Services
         {
             _httpClient = httpClient;
             _httpContextAccessor = httpContextAccessor;
-            var baseUrl = configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5180";
+            var baseUrl = configuration["ApiSettings:BaseUrl"] ?? "http://localhost:7180";
             _httpClient.BaseAddress = new Uri(baseUrl);
         }
 
