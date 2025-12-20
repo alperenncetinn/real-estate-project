@@ -4,6 +4,7 @@ This repository contains a Real Estate web application developed as part of the 
 
 ## Project Team
 
+
 | Name                 | Student ID |
 | -------------------- | ---------- |
 | Alperen CETIN        | 210316026  |
@@ -198,6 +199,5 @@ dotnet test RealEstate.Api.Tests
 
 MIT License
 
-## Last Updated
 
-December 2025
+
