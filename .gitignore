@@ -15,4 +15,11 @@ Thumbs.db
 
 # Environment
 appsettings.local.json
+appsettings.Production.json
 .env
+*.db
+*.db-shm
+*.db-wal
+
+# User Secrets
+secrets.json

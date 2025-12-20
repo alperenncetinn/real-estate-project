@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using RealEstate.Api.Data;
 using RealEstate.Api.Models;
 using RealEstate.Api.Entities;
+using System;
+using System.Linq;
 
 namespace RealEstate.Api.Tests.Helpers
 {
@@ -32,7 +34,7 @@ namespace RealEstate.Api.Tests.Helpers
         {
             var context = CreateContext(databaseName);
 
-            // Seed data ekle
+            // --- 1. Property (Emlak/Konut) Verileri ---
             if (!context.Properties.Any())
             {
                 context.Properties.AddRange(
@@ -61,6 +63,7 @@ namespace RealEstate.Api.Tests.Helpers
                 );
             }
 
+            // --- 2. Listing (İlan) Verileri - GÜNCELLENDİ ---
             if (!context.Listings.Any())
             {
                 context.Listings.AddRange(
@@ -71,6 +74,7 @@ namespace RealEstate.Api.Tests.Helpers
                         Description = "Test açıklama 1",
                         City = "İzmir",
                         Price = 1_500_000,
+                        Type = "Satılık", // <-- EKLENDİ (Test için gerekli)
                         CreatedDate = DateTime.UtcNow
                     },
                     new Listing
@@ -80,6 +84,7 @@ namespace RealEstate.Api.Tests.Helpers
                         Description = "Test açıklama 2",
                         City = "Bursa",
                         Price = 2_500_000,
+                        Type = "Kiralık", // <-- EKLENDİ (Test için gerekli)
                         CreatedDate = DateTime.UtcNow
                     }
                 );

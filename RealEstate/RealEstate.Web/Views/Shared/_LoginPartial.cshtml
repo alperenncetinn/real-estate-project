@@ -1,0 +1,165 @@
+@inject RealEstate.Web.Services.AuthService AuthService
+@inject RealEstate.Web.Services.NotificationService NotificationService
+@{
+    var isAuthenticated = AuthService.IsAuthenticated();
+    var currentUser = AuthService.GetCurrentUser();
+    var isAdmin = AuthService.IsAdmin();
+    var unreadCount = 0;
+
+    if (isAuthenticated)
+    {
+        unreadCount = await NotificationService.GetUnreadCountAsync();
+    }
+}
+
+<ul class="navbar-nav">
+    @if (isAuthenticated && currentUser != null)
+    {
+        <!-- Bildirim Butonu -->
+        <li class="nav-item dropdown me-2">
+            <a class="nav-link position-relative" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path
+                        d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z" />
+                </svg>
+                @if (unreadCount > 0)
+                {
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                        style="font-size: 0.65rem;">
+                        @(unreadCount > 9 ? "9+" : unreadCount.ToString())
+                    </span>
+                }
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown"
+                style="min-width: 300px; max-height: 400px; overflow-y: auto;">
+                <li class="dropdown-header d-flex justify-content-between align-items-center">
+                    <span>Bildirimler</span>
+                    @if (unreadCount > 0)
+                    {
+                        <a href="#" class="small text-primary" onclick="markAllNotificationsRead(); return false;">Tumu
+                            okundu</a>
+                    }
+                </li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li id="notificationList">
+                    <div class="text-center text-muted py-3">
+                        <small>Yukleniyor...</small>
+                    </div>
+                </li>
+            </ul>
+        </li>
+
+        <!-- Kullanici Menu -->
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                @currentUser.FullName
+                @if (isAdmin)
+                {
+                    <span class="badge bg-danger ms-1">Admin</span>
+                }
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                <li><span class="dropdown-item-text text-muted">@currentUser.Email</span></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" asp-controller="Listing" asp-action="MyListings">Ilanlarim</a></li>
+                @if (isAdmin)
+                {
+                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="Listings">Ilan Yonetimi</a></li>
+                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="Users">Kullanici Yonetimi</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                }
+                <li>
+                    <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="dropdown-item text-danger">Cikis Yap</button>
+                    </form>
+                </li>
+            </ul>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="Auth" asp-action="Login">Giris Yap</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link btn btn-outline-primary btn-sm ms-2" asp-controller="Auth" asp-action="Register">Kayit Ol</a>
+        </li>
+    }
+</ul>
+
+@if (isAuthenticated)
+{
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            loadNotifications();
+        });
+
+        // Bildirim dropdown açıldığında yükle
+        document.getElementById('notificationDropdown')?.addEventListener('show.bs.dropdown', function () {
+            loadNotifications();
+        });
+
+        async function loadNotifications() {
+            try {
+                const response = await fetch('/Notification/GetNotifications');
+                const data = await response.json();
+
+                const list = document.getElementById('notificationList');
+                if (!list) return;
+
+                if (data.length === 0) {
+                    list.innerHTML = '<div class="text-center text-muted py-3"><small>Bildirim yok</small></div>';
+                    return;
+                }
+
+                let html = '';
+                data.forEach(n => {
+                    const typeClass = n.type === 'warning' ? 'bg-warning' : n.type === 'success' ? 'bg-success' : 'bg-info';
+                    const readClass = n.isRead ? 'opacity-50' : '';
+                    html += `
+                            <a href="#" class="dropdown-item ${readClass}" onclick="handleNotificationClick(${n.id}, ${n.listingId}); return false;">
+                                <div class="d-flex align-items-start">
+                                    <span class="badge ${typeClass} me-2 mt-1">&nbsp;</span>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-bold small">${n.title}</div>
+                                        <div class="small text-muted text-wrap">${n.message}</div>
+                                        <div class="small text-muted">${new Date(n.createdAt).toLocaleString('tr-TR')}</div>
+                                    </div>
+                                </div>
+                            </a>
+                            <hr class="dropdown-divider m-0">
+                        `;
+                });
+                list.innerHTML = html;
+            } catch (e) {
+                console.error('Error loading notifications:', e);
+            }
+        }
+
+        async function handleNotificationClick(id, listingId) {
+            await fetch(`/Notification/MarkAsRead/${id}`, { method: 'POST' });
+            if (listingId) {
+                window.location.href = `/Listing/Details/${listingId}`;
+            } else {
+                loadNotifications();
+            }
+        }
+
+        async function markAllNotificationsRead() {
+            await fetch('/Notification/MarkAllAsRead', { method: 'POST' });
+            loadNotifications();
+            // Badge'i güncelle
+            const badge = document.querySelector('#notificationDropdown .badge');
+            if (badge) badge.remove();
+        }
+    </script>
+}
