@@ -8,6 +8,8 @@ using RealEstate.Api.Controllers;
 using RealEstate.Api.Data;
 using RealEstate.Api.Dtos;
 using RealEstate.Api.Entities;
+using RealEstate.Api.Repositories;
+using RealEstate.Api.Services;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.IO;
@@ -22,6 +24,8 @@ namespace RealEstate.Api.Tests.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly Mock<IWebHostEnvironment> _mockEnvironment;
+        private readonly IListingRepository _repository;
+        private readonly IListingService _service;
         private readonly ListingsController _controller;
 
         public ListingsControllerTests()
@@ -39,7 +43,9 @@ namespace RealEstate.Api.Tests.Controllers
             _mockEnvironment.Setup(e => e.WebRootPath).Returns(Path.GetTempPath());
             _mockEnvironment.Setup(e => e.ContentRootPath).Returns(Path.GetTempPath());
 
-            _controller = new ListingsController(_context, _mockEnvironment.Object);
+            _repository = new ListingRepository(_context);
+            _service = new ListingService(_repository, _mockEnvironment.Object);
+            _controller = new ListingsController(_service);
         }
 
         public void Dispose()
@@ -70,12 +76,12 @@ namespace RealEstate.Api.Tests.Controllers
         {
             if (!await _context.Users.AnyAsync(u => u.Id == userId))
             {
-                _context.Users.Add(new User 
-                { 
-                    Id = userId, 
-                    FirstName = "Test", 
-                    LastName = "User", 
-                    Email = "test@user.com", 
+                _context.Users.Add(new User
+                {
+                    Id = userId,
+                    FirstName = "Test",
+                    LastName = "User",
+                    Email = "test@user.com",
                     PasswordHash = "hash" // Zorunlu alanları doldur
                 });
                 await _context.SaveChangesAsync();
@@ -92,8 +98,8 @@ namespace RealEstate.Api.Tests.Controllers
             await EnsureUserExists(1); // Kullanıcıyı ekle
 
             // İlanları ekle
-            _context.Listings.Add(new Listing { Title = "Ev 1", UserId = 1, IsActive = true, Type = "Satılık", Description = "Test", City="Ist", Price=100 });
-            _context.Listings.Add(new Listing { Title = "Ev 2", UserId = 1, IsActive = true, Type = "Kiralık", Description = "Test", City="Ank", Price=200 });
+            _context.Listings.Add(new Listing { Title = "Ev 1", UserId = 1, IsActive = true, Type = "Satılık", Description = "Test", City = "Ist", Price = 100 });
+            _context.Listings.Add(new Listing { Title = "Ev 2", UserId = 1, IsActive = true, Type = "Kiralık", Description = "Test", City = "Ank", Price = 200 });
             await _context.SaveChangesAsync();
 
             // Act
@@ -112,8 +118,8 @@ namespace RealEstate.Api.Tests.Controllers
             SetupUser("1");
             await EnsureUserExists(1);
 
-            _context.Listings.Add(new Listing { Title = "Satılık Ev", Type = "Satılık", UserId = 1, IsActive = true, Description = "Desc", City="X", Price=10 });
-            _context.Listings.Add(new Listing { Title = "Kiralık Ev", Type = "Kiralık", UserId = 1, IsActive = true, Description = "Desc", City="Y", Price=20 });
+            _context.Listings.Add(new Listing { Title = "Satılık Ev", Type = "Satılık", UserId = 1, IsActive = true, Description = "Desc", City = "X", Price = 10 });
+            _context.Listings.Add(new Listing { Title = "Kiralık Ev", Type = "Kiralık", UserId = 1, IsActive = true, Description = "Desc", City = "Y", Price = 20 });
             await _context.SaveChangesAsync();
 
             // Act
@@ -123,6 +129,197 @@ namespace RealEstate.Api.Tests.Controllers
             var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
             var items = okResult.Value.Should().BeAssignableTo<IEnumerable<object>>().Subject;
             items.Should().HaveCount(1); // Sadece 1 tane kiralık gelmeli
+        }
+
+        #endregion
+
+        #region Admin Authorization Tests
+
+        [Fact]
+        public async Task GetAll_IncludesInactive_WhenAdminRequestsIncludeInactive()
+        {
+            // Arrange
+            SetupUser("10", "Admin");
+            await EnsureUserExists(10);
+            await EnsureUserExists(11);
+
+            _context.Listings.Add(new Listing { Title = "Aktif", UserId = 10, IsActive = true, Description = "D", Type = "S", City = "C", Price = 100 });
+            _context.Listings.Add(new Listing { Title = "Pasif", UserId = 11, IsActive = false, Description = "D", Type = "S", City = "C", Price = 200 });
+            await _context.SaveChangesAsync();
+
+            // Act
+            var result = await _controller.GetAll(null, true);
+
+            // Assert
+            var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+            var items = okResult.Value.Should().BeAssignableTo<IEnumerable<object>>().Subject.ToList();
+            items.Should().HaveCount(2); // Admin hem aktif hem pasif ilanları görebilmeli
+        }
+
+        [Fact]
+        public async Task GetAll_ExcludesInactive_ForNonAdminEvenWhenRequested()
+        {
+            // Arrange
+            SetupUser("20");
+            await EnsureUserExists(20);
+            await EnsureUserExists(21);
+
+            _context.Listings.Add(new Listing { Title = "Aktif", UserId = 20, IsActive = true, Description = "D", Type = "S", City = "C", Price = 100 });
+            _context.Listings.Add(new Listing { Title = "Pasif", UserId = 21, IsActive = false, Description = "D", Type = "S", City = "C", Price = 200 });
+            await _context.SaveChangesAsync();
+
+            // Act
+            var result = await _controller.GetAll(null, true);
+
+            // Assert
+            var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+            var items = okResult.Value.Should().BeAssignableTo<IEnumerable<object>>().Subject.ToList();
+            items.Should().HaveCount(1); // Non-admin pasif ilanları göremez
+        }
+
+        [Fact]
+        public async Task Delete_AllowsAdminToDeleteAnotherUsersListing()
+        {
+            // Arrange
+            SetupUser("30", "Admin");
+            await EnsureUserExists(30);
+            await EnsureUserExists(31);
+
+            var listing = new Listing { Title = "Sil Admin", UserId = 31, IsActive = true, Description = "D", Type = "S", City = "C", Price = 50 };
+            _context.Listings.Add(listing);
+            await _context.SaveChangesAsync();
+
+            var idToDelete = listing.Id;
+            _context.Entry(listing).State = EntityState.Detached;
+
+            // Act
+            var result = await _controller.Delete(idToDelete);
+
+            // Assert
+            result.Should().BeOfType<OkObjectResult>();
+            var removed = await _context.Listings.FindAsync(idToDelete);
+            removed.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task Delete_ReturnsForbid_WhenUserIsNotOwnerOrAdmin()
+        {
+            // Arrange
+            SetupUser("40");
+            await EnsureUserExists(40);
+            await EnsureUserExists(41);
+
+            var listing = new Listing { Title = "Silme", UserId = 41, IsActive = true, Description = "D", Type = "S", City = "C", Price = 50 };
+            _context.Listings.Add(listing);
+            await _context.SaveChangesAsync();
+
+            var idToDelete = listing.Id;
+            _context.Entry(listing).State = EntityState.Detached;
+
+            // Act
+            var result = await _controller.Delete(idToDelete);
+
+            // Assert
+            result.Should().BeOfType<ForbidResult>();
+            var stillThere = await _context.Listings.FindAsync(idToDelete);
+            stillThere.Should().NotBeNull();
+        }
+
+        #endregion
+
+        #region Permission and Admin Action Tests
+
+        [Fact]
+        public async Task Update_ReturnsForbid_WhenNotOwnerOrAdmin()
+        {
+            // Arrange
+            SetupUser("100");
+            await EnsureUserExists(100);
+            await EnsureUserExists(200);
+
+            var listing = new Listing { Title = "Foreign", UserId = 200, IsActive = true, Description = "D", Type = "S", City = "C", Price = 10 };
+            _context.Listings.Add(listing);
+            await _context.SaveChangesAsync();
+
+            var dto = new ListingDtos { Title = "New" };
+
+            // Act
+            var result = await _controller.Update(listing.Id, dto);
+
+            // Assert
+            result.Should().BeOfType<ForbidResult>();
+            var untouched = await _context.Listings.FindAsync(listing.Id);
+            untouched!.Title.Should().Be("Foreign");
+        }
+
+        [Fact]
+        public async Task Deactivate_SetsAuditFields_AndCreatesNotification_ForAdmin()
+        {
+            // Arrange
+            SetupUser("300", "Admin");
+            await EnsureUserExists(300);
+            await EnsureUserExists(301);
+
+            var listing = new Listing { Title = "Deactivate", UserId = 301, IsActive = true, Description = "D", Type = "S", City = "C", Price = 100 };
+            _context.Listings.Add(listing);
+            await _context.SaveChangesAsync();
+
+            var dto = new DeactivateListingDto { Reason = "Spam" };
+
+            // Act
+            var result = await _controller.Deactivate(listing.Id, dto);
+
+            // Assert
+            result.Should().BeOfType<OkObjectResult>();
+            var refreshed = await _context.Listings.FindAsync(listing.Id);
+            refreshed!.IsActive.Should().BeFalse();
+            refreshed.DeactivationReason.Should().Be("Spam");
+            refreshed.DeactivatedByUserId.Should().Be(300);
+            refreshed.DeactivatedAt.Should().NotBeNull();
+
+            var notification = await _context.Notifications.FirstOrDefaultAsync(n => n.ListingId == listing.Id && n.UserId == 301);
+            notification.Should().NotBeNull();
+        }
+
+        [Fact]
+        public async Task Activate_ReversesDeactivation_AndCreatesNotification()
+        {
+            // Arrange
+            SetupUser("400", "Admin");
+            await EnsureUserExists(400);
+            await EnsureUserExists(401);
+
+            var listing = new Listing
+            {
+                Title = "Reactivate",
+                UserId = 401,
+                IsActive = false,
+                Description = "D",
+                Type = "S",
+                City = "C",
+                Price = 150,
+                DeactivationReason = "Old",
+                DeactivatedAt = DateTime.UtcNow.AddHours(-1),
+                DeactivatedByUserId = 400
+            };
+
+            _context.Listings.Add(listing);
+            await _context.SaveChangesAsync();
+
+            // Act
+            var result = await _controller.Activate(listing.Id);
+
+            // Assert
+            result.Should().BeOfType<OkObjectResult>();
+            var refreshed = await _context.Listings.FindAsync(listing.Id);
+            refreshed!.IsActive.Should().BeTrue();
+            refreshed.DeactivationReason.Should().BeNull();
+            refreshed.DeactivatedAt.Should().BeNull();
+            refreshed.DeactivatedByUserId.Should().BeNull();
+
+            var notification = await _context.Notifications.FirstOrDefaultAsync(n => n.ListingId == listing.Id && n.UserId == 401);
+            notification.Should().NotBeNull();
+            notification!.Type.Should().Be("success");
         }
 
         #endregion
@@ -137,10 +334,10 @@ namespace RealEstate.Api.Tests.Controllers
             await EnsureUserExists(1);
 
             // İlanı ekle ve ID'yi veritabanının vermesine izin ver
-            var listing = new Listing { Title = "Detay İlan", UserId = 1, IsActive = true, Description = "D", Type = "S", City = "C", Price=500, SquareMeters=100 };
+            var listing = new Listing { Title = "Detay İlan", UserId = 1, IsActive = true, Description = "D", Type = "S", City = "C", Price = 500, SquareMeters = 100 };
             _context.Listings.Add(listing);
-            await _context.SaveChangesAsync(); 
-            
+            await _context.SaveChangesAsync();
+
             // DİKKAT: Elle ID (10) vermek yerine, DB'nin atadığı ID'yi (listing.Id) alıyoruz.
             var generatedId = listing.Id;
 
@@ -212,13 +409,13 @@ namespace RealEstate.Api.Tests.Controllers
         public async Task Update_UpdatesFieldsCorrectly()
         {
             // Arrange
-            SetupUser("2"); 
+            SetupUser("2");
             await EnsureUserExists(2);
-            
-            var existing = new Listing { Title = "Eski", UserId = 2, IsActive = true, Description = "D", Type = "S", City = "C", SquareMeters = 50, RoomCount = "1+1", Price=100 };
+
+            var existing = new Listing { Title = "Eski", UserId = 2, IsActive = true, Description = "D", Type = "S", City = "C", SquareMeters = 50, RoomCount = "1+1", Price = 100 };
             _context.Listings.Add(existing);
             await _context.SaveChangesAsync();
-            
+
             // Context takibini temizle (fresh data)
             _context.Entry(existing).State = EntityState.Detached;
             var idToUpdate = existing.Id;
@@ -257,10 +454,10 @@ namespace RealEstate.Api.Tests.Controllers
             SetupUser("3");
             await EnsureUserExists(3);
 
-            var listing = new Listing { Title = "Sil Beni", UserId = 3, IsActive = true, Description = "D", Type = "S", City = "C", Price=50 };
+            var listing = new Listing { Title = "Sil Beni", UserId = 3, IsActive = true, Description = "D", Type = "S", City = "C", Price = 50 };
             _context.Listings.Add(listing);
             await _context.SaveChangesAsync();
-            
+
             var idToDelete = listing.Id;
             _context.Entry(listing).State = EntityState.Detached;
 

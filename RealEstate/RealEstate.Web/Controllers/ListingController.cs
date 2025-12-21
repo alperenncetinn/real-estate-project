@@ -81,12 +81,16 @@ namespace RealEstate.Web.Controllers
 
             // --- DEDEKTİF MODU BAŞLANGIÇ ---
             Console.WriteLine("--------------------------------------------------");
-            Console.WriteLine($"[WEB DEBUG] Formdan Gelen Başlık: {model.Title}");
-            Console.WriteLine($"[WEB DEBUG] Formdan Gelen Oda Sayısı: '{model.RoomCount}'"); 
-            Console.WriteLine($"[WEB DEBUG] Formdan Gelen Metrekare: {model.SquareMeters}");
+            Console.WriteLine($"[WEB CONTROLLER] Token Kontrol: IsAuthenticated = {_authService.IsAuthenticated()}");
+            var token = HttpContext.Request.Cookies["auth_token"];
+            Console.WriteLine($"[WEB CONTROLLER] Cookie'den Token: {(string.IsNullOrEmpty(token) ? "BOŞŞŞ!" : token.Substring(0, Math.Min(30, token.Length)) + "...")}");
+            Console.WriteLine($"[WEB CONTROLLER] Formdan Gelen Başlık: {model.Title}");
+            Console.WriteLine($"[WEB CONTROLLER] Formdan Gelen Oda Sayısı: '{model.RoomCount}'");
+            Console.WriteLine($"[WEB CONTROLLER] Formdan Gelen Metrekare: {model.SquareMeters}");
+            Console.WriteLine($"[WEB CONTROLLER] Formdan Gelen UserId: {model.UserId}");
             Console.WriteLine("--------------------------------------------------");
             // --- DEDEKTİF MODU BİTİŞ ---
-            
+
             var (success, errorMsg) = await _apiService.CreateListingAsync(model);
 
             if (success)
@@ -116,7 +120,7 @@ namespace RealEstate.Web.Controllers
                 Price = value.Price,
                 Description = value.Description,
                 Type = value.Type,
-                RoomCount = value.RoomCount?.Trim(), 
+                RoomCount = value.RoomCount?.Trim(),
                 SquareMeters = value.SquareMeters,
                 UserId = value.UserId ?? 0,
                 ImageUrl = value.ImageUrl
@@ -131,9 +135,9 @@ namespace RealEstate.Web.Controllers
         public async Task<IActionResult> Edit(int id, CreateListingViewModel model)
         {
             if (!_authService.IsAuthenticated()) return RedirectToAction("Login", "Auth");
-            
+
             bool result = await _apiService.UpdateListingAsync(id, model);
-            
+
             if (result) return RedirectToAction("Index");
 
             ModelState.AddModelError("", "Güncelleme başarısız.");

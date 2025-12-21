@@ -92,6 +92,13 @@ namespace RealEstate.Web.Services
             var context = _httpContextAccessor.HttpContext;
             if (context == null) return;
 
+            Console.WriteLine("--------------------------------------------------");
+            Console.WriteLine($"[AUTH] SaveUserSession çağrıldı");
+            Console.WriteLine($"[AUTH] Token: {(string.IsNullOrEmpty(loginData.Token) ? "BOŞ!!!" : loginData.Token.Substring(0, Math.Min(30, loginData.Token.Length)) + "...")}");
+            Console.WriteLine($"[AUTH] UserId: {loginData.Id}");
+            Console.WriteLine($"[AUTH] Email: {loginData.Email}");
+            Console.WriteLine("--------------------------------------------------");
+
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
