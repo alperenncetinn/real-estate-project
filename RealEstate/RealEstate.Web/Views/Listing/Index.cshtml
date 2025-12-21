@@ -7,132 +7,181 @@
     var isAdmin = currentUser?.Role == "Admin";
 }
 
-<div class="container mt-5">
+<div class="container-xxl mt-3">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">🏡 Emlak İlanları</h2>
-        <a asp-action="Create" class="btn btn-success fw-bold">+ Yeni İlan Ekle</a>
+    <div
+        class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+        <div>
+            <h2 class="mb-1">🏡 Emlak İlanları</h2>
+            <p class="text-muted mb-0 small">Güncel ilanları filtreleyin, size en uygun evi hemen bulun.</p>
+        </div>
+        <div class="d-flex gap-2 w-100 w-md-auto">
+            <button class="btn btn-outline-primary d-md-none flex-grow-1" type="button" data-bs-toggle="collapse"
+                data-bs-target="#filterPanel" aria-expanded="false" aria-controls="filterPanel">
+                <i class="bi bi-funnel"></i> Filtreleri Aç
+            </button>
+            <a asp-action="Create" class="btn btn-success fw-bold flex-grow-1 flex-md-grow-0">+ Yeni İlan Ekle</a>
+        </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-3">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="bi bi-funnel-fill me-2"></i>Filtrele</h5>
-                </div>
-                <div class="card-body">
-                    <form asp-action="Index" method="get">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">İlan Tipi</label>
-                            <select name="type" class="form-select">
-                                <option value="">Tümü</option>
-                                <!option value="Satılık" @(ViewBag.CurrentType == "Satılık" ? "selected" : "")>Satılık</!option>
-                                <!option value="Kiralık" @(ViewBag.CurrentType == "Kiralık" ? "selected" : "")>Kiralık</!option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Sıralama</label>
-                            <select name="sort" class="form-select">
-                                <option value="">Önerilen</option>
-                                <!option value="price_asc" @(ViewBag.CurrentSort == "price_asc" ? "selected" : "")>Fiyat (Artan)</!option>
-                                <!option value="price_desc" @(ViewBag.CurrentSort == "price_desc" ? "selected" : "")>Fiyat (Azalan)</!option>
-                                <!option value="date_desc" @(ViewBag.CurrentSort == "date_desc" ? "selected" : "")>En Yeni</!option>
-                                <!option value="date_asc" @(ViewBag.CurrentSort == "date_asc" ? "selected" : "")>En Eski</!option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Şehir</label>
-                            <input type="text" name="city" class="form-control" placeholder="Örn: İstanbul" value="@ViewBag.CurrentCity">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Fiyat Aralığı (TL)</label>
-                            <div class="d-flex gap-2">
-                                <input type="number" name="minPrice" class="form-control" placeholder="Min" value="@ViewBag.CurrentMinPrice">
-                                <input type="number" name="maxPrice" class="form-control" placeholder="Max" value="@ViewBag.CurrentMaxPrice">
+    <div class="row g-4">
+        <div class="col-md-4 col-lg-3">
+            <div id="filterPanel" class="collapse show d-md-block">
+                <div class="card filter-card mb-4">
+                    <div class="card-header text-dark">
+                        <h5 class="mb-0"><i class="bi bi-funnel-fill me-2"></i>Filtrele</h5>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="Index" method="get" class="d-flex flex-column gap-3">
+                            <div>
+                                <label class="form-label fw-bold">İlan Tipi</label>
+                                <select name="type" class="form-select">
+                                    <option value="">Tümü</option>
+                                    <option value="Satılık"
+                                        selected="@(ViewBag.CurrentType == "Satılık" ? "selected" : null)">Satılık
+                                    </option>
+                                    <option value="Kiralık"
+                                        selected="@(ViewBag.CurrentType == "Kiralık" ? "selected" : null)">Kiralık
+                                    </option>
+                                </select>
                             </div>
-                        </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Oda Sayısı</label>
-                            <select name="roomCount" class="form-select">
-                                <option value="">Farketmez</option>
-                                <!option value="1+0" @(ViewBag.CurrentRoomCount == "1+0" ? "selected" : "")>1+0</!option>
-                                <!option value="1+1" @(ViewBag.CurrentRoomCount == "1+1" ? "selected" : "")>1+1</!option>
-                                <!option value="2+1" @(ViewBag.CurrentRoomCount == "2+1" ? "selected" : "")>2+1</!option>
-                                <!option value="3+1" @(ViewBag.CurrentRoomCount == "3+1" ? "selected" : "")>3+1</!option>
-                                <!option value="4+1" @(ViewBag.CurrentRoomCount == "4+1" ? "selected" : "")>4+1</!option>
-                                <!option value="Villa" @(ViewBag.CurrentRoomCount == "Villa" ? "selected" : "")>Villa</!option>
-                            </select>
-                        </div>
+                            <div>
+                                <label class="form-label fw-bold">Sıralama</label>
+                                <select name="sort" class="form-select">
+                                    <option value="">Önerilen</option>
+                                    <option value="price_asc"
+                                        selected="@(ViewBag.CurrentSort == "price_asc" ? "selected" : null)">Fiyat
+                                        (Artan)</option>
+                                    <option value="price_desc"
+                                        selected="@(ViewBag.CurrentSort == "price_desc" ? "selected" : null)">Fiyat
+                                        (Azalan)</option>
+                                    <option value="date_desc"
+                                        selected="@(ViewBag.CurrentSort == "date_desc" ? "selected" : null)">En Yeni
+                                    </option>
+                                    <option value="date_asc"
+                                        selected="@(ViewBag.CurrentSort == "date_asc" ? "selected" : null)">En Eski
+                                    </option>
+                                </select>
+                            </div>
 
-                        <button type="submit" class="btn btn-primary w-100">Uygula</button>
-                        <a asp-action="Index" class="btn btn-outline-secondary w-100 mt-2">Temizle</a>
-                    </form>
+                            <div>
+                                <label class="form-label fw-bold">Şehir</label>
+                                <input type="text" name="city" class="form-control" placeholder="Örn: İstanbul"
+                                    value="@ViewBag.CurrentCity">
+                            </div>
+
+                            <div>
+                                <label class="form-label fw-bold">Fiyat Aralığı (TL)</label>
+                                <div class="d-flex gap-2">
+                                    <input type="number" name="minPrice" class="form-control" placeholder="Min"
+                                        value="@ViewBag.CurrentMinPrice">
+                                    <input type="number" name="maxPrice" class="form-control" placeholder="Max"
+                                        value="@ViewBag.CurrentMaxPrice">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="form-label fw-bold">Oda Sayısı</label>
+                                <select name="roomCount" class="form-select">
+                                    <option value="">Farketmez</option>
+                                    <option value="1+0"
+                                        selected="@(ViewBag.CurrentRoomCount == "1+0" ? "selected" : null)">1+0</option>
+                                    <option value="1+1"
+                                        selected="@(ViewBag.CurrentRoomCount == "1+1" ? "selected" : null)">1+1</option>
+                                    <option value="2+1"
+                                        selected="@(ViewBag.CurrentRoomCount == "2+1" ? "selected" : null)">2+1</option>
+                                    <option value="3+1"
+                                        selected="@(ViewBag.CurrentRoomCount == "3+1" ? "selected" : null)">3+1</option>
+                                    <option value="4+1"
+                                        selected="@(ViewBag.CurrentRoomCount == "4+1" ? "selected" : null)">4+1</option>
+                                    <option value="Villa"
+                                        selected="@(ViewBag.CurrentRoomCount == "Villa" ? "selected" : null)">Villa
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary w-100">Uygula</button>
+                                <a asp-action="Index" class="btn btn-outline-secondary w-100">Temizle</a>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-9">
-            
+        <div class="col-md-8 col-lg-9">
             @if (Model == null || Model.Count == 0)
             {
-                <div class="alert alert-warning text-center p-5 shadow-sm rounded">
-                    <h4>🔍 İlan Bulunamadı</h4>
+                <div class="alert alert-warning text-center p-5 rounded empty-state">
+                    <h4 class="mb-2">🔍 İlan Bulunamadı</h4>
                     <p class="mb-0">Seçtiğiniz kriterlere uygun ilan yok. Filtreleri temizleyip tekrar deneyin.</p>
                 </div>
             }
             else
             {
-                <div class="row">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 listing-grid">
                     @foreach (var item in Model)
                     {
-                        <div class="col-md-6 col-lg-4 mb-4">
-                            <div class="card h-100 shadow-sm border-0 hover-shadow">
-                                
+                        <div class="col">
+                            <div class="card listing-card h-100">
                                 <div class="position-relative">
                                     @if (!string.IsNullOrEmpty(item.ImageUrl))
                                     {
-                                        <img src="@item.ImageUrl" class="card-img-top" alt="@item.Title" style="height: 200px; object-fit: cover;">
+                                        <img src="http://localhost:5180@(item.ImageUrl)" class="listing-img" alt="@item.Title"
+                                            onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 600 400%22%3E%3Crect fill=%22%23f1f5f9%22 width=%22600%22 height=%22400%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-family=%22system-ui%22 font-size=%2224%22 fill=%22%23cbd5e1%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22%3EResim Yükleme Hatası%3C/text%3E%3C/svg%3E'">
                                     }
                                     else
                                     {
-                                        <img src="https://placehold.co/600x400?text=Resim+Yok" class="card-img-top" style="height: 200px; object-fit: cover;">
+                                        <div
+                                            class="listing-img listing-placeholder d-flex align-items-center justify-content-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#cbd5e1"
+                                                viewBox="0 0 16 16">
+                                                <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+                                                <path
+                                                    d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z" />
+                                            </svg>
+                                        </div>
                                     }
-                                    <span class="position-absolute top-0 end-0 badge @(item.Type == "Kiralık" ? "bg-warning text-dark" : "bg-success") m-2">
+                                    <span
+                                        class="position-absolute top-0 end-0 listing-badge badge @(item.Type == "Kiralık" ? "bg-warning text-dark" : "bg-success") m-2">
                                         @item.Type
                                     </span>
                                 </div>
 
-                                <div class="card-body">
+                                <div class="card-body d-flex flex-column gap-1">
                                     <h5 class="card-title text-truncate" title="@item.Title">@item.Title</h5>
-                                    <p class="card-text text-muted small mb-2">
+                                    <p class="listing-meta small mb-1">
                                         <i class="bi bi-geo-alt-fill text-danger"></i> @item.City / @(item.District ?? "-")
                                     </p>
-                                    
-                                    <div class="d-flex justify-content-between mb-3 text-muted small">
+
+                                    <div class="d-flex justify-content-between text-muted small">
                                         <span><i class="bi bi-door-open"></i> @(item.RoomCount ?? "-")</span>
                                         <span><i class="bi bi-aspect-ratio"></i> @item.SquareMeters m²</span>
                                     </div>
 
-                                    <h5 class="text-primary fw-bold mb-3">@item.Price.ToString("N0") ₺</h5>
+                                    <h5 class="text-primary fw-bold mb-1">@item.Price.ToString("N0") ₺</h5>
 
-                                    <div class="d-grid gap-2">
-                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary btn-sm">Detayları Gör</a>
-                                        
-                                        @if (isAdmin || (currentUser != null && item.UserId.HasValue && item.UserId == currentUser.Id))
+                                    <div class="d-grid gap-2 mt-auto">
+                                        <a asp-action="Details" asp-route-id="@item.Id"
+                                            class="btn btn-outline-primary btn-sm">Detayları Gör</a>
+
+                                        @if (isAdmin || (currentUser != null && item.UserId.HasValue && item.UserId ==
+                                                                        currentUser.Id))
                                         {
                                             <div class="btn-group">
-                                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Düzenle</a>
-                                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm" onclick="return confirm('Silmek istediğine emin misin?');">Sil</a>
+                                                <a asp-action="Edit" asp-route-id="@item.Id"
+                                                    class="btn btn-warning btn-sm">Düzenle</a>
+                                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm"
+                                                    onclick="return confirm('Silmek istediğine emin misin?');">Sil</a>
                                             </div>
                                         }
                                     </div>
                                 </div>
-                                <div class="card-footer bg-white text-muted small">
-                                    <i class="bi bi-clock"></i> @item.CreatedDate.ToString("dd.MM.yyyy")
+                                <div
+                                    class="card-footer bg-white text-muted small d-flex justify-content-between align-items-center">
+                                    <span><i class="bi bi-clock"></i> @item.CreatedDate.ToString("dd.MM.yyyy")</span>
                                 </div>
                             </div>
                         </div>
@@ -142,11 +191,3 @@
         </div>
     </div>
 </div>
-
-<style>
-    .hover-shadow:hover {
-        transform: translateY(-5px);
-        transition: all 0.3s ease;
-        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
-    }
-</style>

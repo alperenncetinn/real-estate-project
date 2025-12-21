@@ -1,5 +1,5 @@
 using System.Net.Http.Headers;
-using System.Net.Http.Json; 
+using System.Net.Http.Json;
 using Microsoft.Extensions.Configuration;
 using RealEstate.Web.Models;
 using System.Globalization;
@@ -15,16 +15,27 @@ namespace RealEstate.Web.Services
         {
             _httpClient = httpClient;
             _httpContextAccessor = httpContextAccessor;
-            var baseUrl = configuration["ApiSettings:BaseUrl"] ?? "http://localhost:7180";
+            var baseUrl = configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5180";
             _httpClient.BaseAddress = new Uri(baseUrl);
+            Console.WriteLine($"[API SERVICE] BaseAddress: {_httpClient.BaseAddress}");
         }
 
         private void SetAuthHeader()
         {
             _httpClient.DefaultRequestHeaders.Authorization = null;
             var token = _httpContextAccessor.HttpContext?.Request.Cookies["auth_token"];
+
+            Console.WriteLine($"[API DEBUG] Token Kontrol: {(string.IsNullOrEmpty(token) ? "BOŞ" : "VAR")}");
             if (!string.IsNullOrEmpty(token))
+            {
+                Console.WriteLine($"[API DEBUG] Token İlk 20 Karakter: {token.Substring(0, Math.Min(20, token.Length))}...");
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                Console.WriteLine("[API DEBUG] Authorization Header Set edildi");
+            }
+            else
+            {
+                Console.WriteLine("[API DEBUG] Token alınamadı! Cookie bulunamadı veya boş.");
+            }
         }
 
         public async Task<List<ListingViewModel>> GetAllListingsAsync(string? type = null)
@@ -44,9 +55,11 @@ namespace RealEstate.Web.Services
         // --- GÜNCELLENEN KISIM: Hatayı yakalayıp detay veriyoruz ---
         public async Task<(bool Success, string Error)> CreateListingAsync(CreateListingViewModel model)
         {
-            try 
+            try
             {
+                Console.WriteLine("[CREATE LISTING] Başlatılıyor...");
                 SetAuthHeader();
+
                 using var content = new MultipartFormDataContent();
                 var culture = CultureInfo.InvariantCulture;
 
@@ -66,16 +79,22 @@ namespace RealEstate.Web.Services
                     content.Add(fileContent, "Photo", model.Photo.FileName);
                 }
 
+                Console.WriteLine("[CREATE LISTING] API'ye istek gönderiliyor...");
                 var response = await _httpClient.PostAsync("api/listings", content);
+
+                Console.WriteLine($"[CREATE LISTING] Yanıt Kodu: {response.StatusCode} ({response.ReasonPhrase})");
 
                 if (response.IsSuccessStatusCode)
                 {
+                    Console.WriteLine("[CREATE LISTING] BAŞARILI");
                     return (true, "");
                 }
                 else
                 {
                     // API cevabı boşsa Durum Kodunu (401, 500 vb.) yazdır
                     var errorMsg = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"[CREATE LISTING] Hata Mesajı: {errorMsg}");
+
                     if (string.IsNullOrEmpty(errorMsg))
                     {
                         return (false, $"Sunucu Cevabı Boş. Hata Kodu: {response.StatusCode} ({response.ReasonPhrase})");
@@ -85,7 +104,7 @@ namespace RealEstate.Web.Services
             }
             catch (Exception ex)
             {
-                // API kapalıysa veya ulaşılamıyorsa buraya düşer
+                Console.WriteLine($"[CREATE LISTING] Exception: {ex.Message}");
                 return (false, $"Bağlantı Hatası: {ex.Message}");
             }
         }

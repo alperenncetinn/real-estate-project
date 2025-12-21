@@ -35,8 +35,7 @@
                         </div>
                     </div>
 
-                    <a class="category-btn rent-btn mt-3"
-                       href="@Url.Action("Index", "Listing", new { type = "Kiralık" })">
+                    <a class="category-btn rent-btn mt-3" href="/Listing?type=Kiralik">
                         Kiralık İlanlara Git →
                     </a>
                 </div>
@@ -59,8 +58,7 @@
                         </div>
                     </div>
 
-                    <a class="category-btn sale-btn mt-3"
-                       href="@Url.Action("Index", "Listing", new { type = "Satılık" })">
+                    <a class="category-btn sale-btn mt-3" href="/Listing?type=Satilik">
                         Satılık İlanlara Git →
                     </a>
                 </div>
@@ -78,9 +76,9 @@
         --sale: #198754;
         --text: #111827;
         --muted: #6b7280;
-        --border: rgba(17,24,39,.10);
-        --shadow: 0 10px 28px rgba(0,0,0,.06);
-        --shadowHover: 0 16px 40px rgba(0,0,0,.10);
+        --border: rgba(17, 24, 39, .10);
+        --shadow: 0 10px 28px rgba(0, 0, 0, .06);
+        --shadowHover: 0 16px 40px rgba(0, 0, 0, .10);
     }
 
     .hero-title {
@@ -108,18 +106,18 @@
         background: #fff;
     }
 
-        .category-card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadowHover);
-            border-color: rgba(17,24,39,.16);
-        }
+    .category-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadowHover);
+        border-color: rgba(17, 24, 39, .16);
+    }
 
     .category-rent {
-        background: linear-gradient(180deg, rgba(13,110,253,.06), rgba(255,255,255,1) 55%);
+        background: linear-gradient(180deg, rgba(13, 110, 253, .06), rgba(255, 255, 255, 1) 55%);
     }
 
     .category-sale {
-        background: linear-gradient(180deg, rgba(25,135,84,.06), rgba(255,255,255,1) 55%);
+        background: linear-gradient(180deg, rgba(25, 135, 84, .06), rgba(255, 255, 255, 1) 55%);
     }
 
     .category-body {
@@ -137,7 +135,7 @@
         font-size: 28px;
         color: #fff;
         flex-shrink: 0;
-        box-shadow: 0 10px 18px rgba(0,0,0,.10);
+        box-shadow: 0 10px 18px rgba(0, 0, 0, .10);
     }
 
     .rent-icon {
@@ -159,12 +157,12 @@
     }
 
     .rent-badge {
-        background: rgba(13,110,253,.12);
+        background: rgba(13, 110, 253, .12);
         color: var(--rent);
     }
 
     .sale-badge {
-        background: rgba(25,135,84,.12);
+        background: rgba(25, 135, 84, .12);
         color: var(--sale);
     }
 
@@ -201,14 +199,14 @@
         font-weight: 800;
         border: 0;
         transition: transform .15s ease, filter .15s ease, box-shadow .15s ease;
-        box-shadow: 0 10px 18px rgba(0,0,0,.08);
+        box-shadow: 0 10px 18px rgba(0, 0, 0, .08);
     }
 
-        .category-btn:hover {
-            transform: translateY(-1px);
-            filter: brightness(.98);
-            box-shadow: 0 14px 26px rgba(0,0,0,.12);
-        }
+    .category-btn:hover {
+        transform: translateY(-1px);
+        filter: brightness(.98);
+        box-shadow: 0 14px 26px rgba(0, 0, 0, .12);
+    }
 
     .rent-btn {
         background: var(--rent);

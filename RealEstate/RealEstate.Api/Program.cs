@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RealEstate.Api.Data;
 using RealEstate.Api.Entities;
+using RealEstate.Api.Repositories;
 using RealEstate.Api.Services;
 using System.Security.Cryptography;
 using System.Text;
@@ -19,6 +20,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // JWT Service
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IListingRepository, ListingRepository>();
+builder.Services.AddScoped<IListingService, ListingService>();
 
 // JWT Authentication yapılandırması
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
