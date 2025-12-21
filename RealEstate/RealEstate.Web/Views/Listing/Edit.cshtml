@@ -1,38 +1,65 @@
 @model RealEstate.Web.Models.CreateListingViewModel
-
-@{
-    ViewData["Title"] = "İlanı Düzenle";
-}
+@{ ViewData["Title"] = "İlanı Düzenle"; }
 
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">✏️ İlanı Düzenle</h4>
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header bg-warning text-dark p-4">
+                    <h4 class="mb-0 fw-bold">✏️ İlanı Düzenle</h4>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     <form asp-action="Edit" method="post" enctype="multipart/form-data">
                         
+                        <input type="hidden" name="ImageUrl" value="@ViewBag.CurrentImage" />
+
                         <div class="mb-3">
-                            <label class="form-label">İlan Başlığı</label>
+                            <label class="form-label fw-bold">İlan Başlığı</label>
                             <input asp-for="Title" class="form-control" />
                             <span asp-validation-for="Title" class="text-danger"></span>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Şehir</label>
+                                <label class="form-label fw-bold">Şehir</label>
                                 <input asp-for="City" class="form-control" />
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Fiyat (₺)</label>
+                                <label class="form-label fw-bold">Fiyat (₺)</label>
                                 <input asp-for="Price" class="form-control" type="number" />
                             </div>
                         </div>
 
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">İlan Tipi</label>
+                                <select asp-for="Type" class="form-select">
+                                    <option value="Satılık">Satılık</option>
+                                    <option value="Kiralık">Kiralık</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Oda Sayısı</label>
+                                <select asp-for="RoomCount" class="form-select">
+                                    <option value="">Seçiniz</option>
+                                    <option value="1+0">1+0</option>
+                                    <option value="1+1">1+1</option>
+                                    <option value="2+1">2+1</option>
+                                    <option value="3+1">3+1</option>
+                                    <option value="4+1">4+1</option>
+                                    <option value="4+2">4+2</option>
+                                    <option value="5+1">5+1</option>
+                                    <option value="Villa">Villa</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Metrekare (m²)</label>
+                                <input asp-for="SquareMeters" class="form-control" type="number" />
+                            </div>
+                        </div>
+
                         <div class="mb-3">
-                            <label class="form-label">Açıklama</label>
+                            <label class="form-label fw-bold">Açıklama</label>
                             <textarea asp-for="Description" class="form-control" rows="4"></textarea>
                         </div>
 
@@ -44,7 +71,7 @@
                                     <p class="small text-muted mb-1">Şu anki Resim:</p>
                                     @if (!string.IsNullOrEmpty(ViewBag.CurrentImage))
                                     {
-                                        <img src="http://localhost:5180@(ViewBag.CurrentImage)" 
+                                        <img src="@ViewBag.CurrentImage" 
                                              alt="Mevcut Resim" 
                                              class="img-thumbnail" 
                                              style="width: 120px; height: 80px; object-fit: cover;">
@@ -63,10 +90,9 @@
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">Değişiklikleri Kaydet 💾</button>
+                            <button type="submit" class="btn btn-primary btn-lg fw-bold">Değişiklikleri Kaydet 💾</button>
                             <a asp-action="Index" class="btn btn-outline-secondary">İptal</a>
                         </div>
-
                     </form>
                 </div>
             </div>

@@ -1,106 +1,87 @@
 @model RealEstate.Web.Models.ListingViewModel
-@{
-    ViewData["Title"] = Model.Title;
-}
+@{ ViewData["Title"] = Model.Title; }
 
-<div class="container">
+<div class="container mt-4">
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a asp-action="Index">Ilanlar</a></li>
+            <li class="breadcrumb-item"><a asp-action="Index">İlanlar</a></li>
             <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
         </ol>
     </nav>
 
     <div class="row">
-        <div class="col-md-7">
+        <div class="col-md-7 mb-4">
             @if (!string.IsNullOrEmpty(Model.ImageUrl))
             {
-                <img src="http://localhost:5180@(Model.ImageUrl)" alt="@Model.Title" class="img-fluid rounded shadow"
-                    style="width: 100%; max-height: 500px; object-fit: cover;">
+                <img src="@Model.ImageUrl" alt="@Model.Title" class="img-fluid rounded shadow w-100"
+                     style="max-height: 500px; object-fit: cover;">
             }
             else
             {
-                <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded"
-                    style="height: 400px;">
-                    <span>Resim Yok</span>
+                <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded shadow"
+                     style="height: 400px;">
+                    <span class="fs-4">Resim Yok</span>
                 </div>
             }
         </div>
+
         <div class="col-md-5">
-            <div class="card shadow">
+            <div class="card shadow border-0">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start mb-3">
-                        <h3 class="card-title mb-0">@Model.Title</h3>
+                        <h3 class="card-title mb-0 fw-bold">@Model.Title</h3>
                         @if (!Model.IsActive)
                         {
                             <span class="badge bg-danger">Pasif</span>
                         }
                     </div>
 
-                    <h4 class="text-primary mb-4">@Model.Price.ToString("N0") TL</h4>
-
+                    <h3 class="text-primary fw-bold mb-4">@Model.Price.ToString("N0") ₺</h3>
                     <hr>
 
-                    <div class="row mb-3">
-                        <div class="col-6">
-                            <small class="text-muted">Ilan Turu</small>
-                            <p class="mb-0">
-                                <span class="badge @(Model.Type == "Satilik" ? "bg-success" : "bg-info")">
-                                    @Model.Type
-                                </span>
-                            </p>
-                        </div>
-                        <div class="col-6">
-                            <small class="text-muted">Sehir</small>
-                            <p class="mb-0 fw-bold">@Model.City</p>
-                        </div>
-                    </div>
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span class="text-muted">İlan Türü</span>
+                            <span class="badge @(Model.Type == "Satılık" ? "bg-success" : "bg-info") rounded-pill">@Model.Type</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span class="text-muted">Şehir / İlçe</span>
+                            <span class="fw-bold">@Model.City @(!string.IsNullOrEmpty(Model.District) ? " / " + Model.District : "")</span>
+                        </li>
+                        
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span class="text-muted">Oda Sayısı</span>
+                            <span class="fw-bold">@(string.IsNullOrEmpty(Model.RoomCount) ? "Belirtilmemiş" : Model.RoomCount)</span>
+                        </li>
 
-                    @if (!string.IsNullOrEmpty(Model.District))
-                    {
-                        <div class="mb-3">
-                            <small class="text-muted">Ilce</small>
-                            <p class="mb-0 fw-bold">@Model.District</p>
-                        </div>
-                    }
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span class="text-muted">Metrekare</span>
+                            <span class="fw-bold">@Model.SquareMeters m²</span>
+                        </li>
+                        
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span class="text-muted">İlan Tarihi</span>
+                            <span>@Model.CreatedDate.ToString("dd.MM.yyyy")</span>
+                        </li>
 
-                    @if (!string.IsNullOrEmpty(Model.RoomCount))
-                    {
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <small class="text-muted">Oda Sayisi</small>
-                                <p class="mb-0 fw-bold">@Model.RoomCount</p>
-                            </div>
-                            @if (Model.SquareMeters > 0)
-                            {
-                                <div class="col-6">
-                                    <small class="text-muted">m2</small>
-                                    <p class="mb-0 fw-bold">@Model.SquareMeters m²</p>
-                                </div>
-                            }
-                        </div>
-                    }
-
-                    @if (!string.IsNullOrEmpty(Model.OwnerName))
-                    {
-                        <div class="mb-3">
-                            <small class="text-muted">Ilan Sahibi</small>
-                            <p class="mb-0 fw-bold">@Model.OwnerName</p>
-                        </div>
-                    }
-
-                    <div class="mb-3">
-                        <small class="text-muted">Ilan Tarihi</small>
-                        <p class="mb-0">@Model.CreatedDate.ToString("dd.MM.yyyy")</p>
-                    </div>
+                        @if (!string.IsNullOrEmpty(Model.OwnerName))
+                        {
+                             <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span class="text-muted">İlan Sahibi</span>
+                                <span class="fw-bold">@Model.OwnerName</span>
+                            </li>
+                        }
+                    </ul>
 
                     @if (!Model.IsActive && !string.IsNullOrEmpty(Model.DeactivationReason))
                     {
                         <div class="alert alert-warning mt-3">
-                            <strong>Bu ilan pasife alinmistir.</strong><br>
+                            <strong>Bu ilan pasife alınmıştır.</strong><br>
                             <small>Neden: @Model.DeactivationReason</small>
                         </div>
                     }
+                    
+                    <a asp-action="Index" class="btn btn-outline-primary w-100 mt-2">Geri Dön</a>
                 </div>
             </div>
         </div>
@@ -108,17 +89,13 @@
 
     @if (!string.IsNullOrEmpty(Model.Description))
     {
-        <div class="card mt-4 shadow-sm">
-            <div class="card-header">
-                <h5 class="mb-0">Aciklama</h5>
+        <div class="card mt-4 shadow-sm border-0 mb-5">
+            <div class="card-header bg-light">
+                <h5 class="mb-0 fw-bold">Açıklama</h5>
             </div>
             <div class="card-body">
-                <p class="mb-0" style="white-space: pre-line;">@Model.Description</p>
+                <p class="mb-0 text-secondary" style="white-space: pre-line; line-height: 1.6;">@Model.Description</p>
             </div>
         </div>
     }
-
-    <div class="mt-4">
-        <a asp-action="Index" class="btn btn-outline-secondary">Ilanlara Don</a>
-    </div>
 </div>
