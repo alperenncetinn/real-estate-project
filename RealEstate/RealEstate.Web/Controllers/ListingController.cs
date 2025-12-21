@@ -1,8 +1,10 @@
+using System; // Console.WriteLine için gerekli
 using Microsoft.AspNetCore.Mvc;
 using RealEstate.Web.Models;
 using RealEstate.Web.Services;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace RealEstate.Web.Controllers
 {
@@ -17,161 +19,149 @@ namespace RealEstate.Web.Controllers
             _authService = authService;
         }
 
-        // --- 1. LİSTELEME (INDEX) ---
+        // --- 1. INDEX (FİLTRELEME) ---
         [HttpGet]
-        public async Task<IActionResult> Index(string? type) // <-- DEĞİŞİKLİK: Parametre eklendi
+        public async Task<IActionResult> Index(string? type, string? sort, string? city, int? minPrice, int? maxPrice, string? roomCount)
         {
-            // Gelen type bilgisini (Kiralık/Satılık) servise gönderiyoruz
             var values = await _apiService.GetAllListingsAsync(type);
+            if (values == null) values = new List<ListingViewModel>();
 
-            // Eğer filtre varsa sayfada göstermek için ViewBag'e atabiliriz (Opsiyonel)
+            if (!string.IsNullOrEmpty(city))
+            {
+                var searchCity = city.Trim().ToLower();
+                values = values.Where(x => x.City != null && x.City.ToLower().Contains(searchCity)).ToList();
+            }
+
+            if (minPrice.HasValue) values = values.Where(x => x.Price >= minPrice.Value).ToList();
+            if (maxPrice.HasValue) values = values.Where(x => x.Price <= maxPrice.Value).ToList();
+
+            if (!string.IsNullOrEmpty(roomCount))
+            {
+                values = values.Where(x => x.RoomCount != null && x.RoomCount.Trim() == roomCount.Trim()).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(sort))
+            {
+                switch (sort)
+                {
+                    case "price_asc": values = values.OrderBy(x => x.Price).ToList(); break;
+                    case "price_desc": values = values.OrderByDescending(x => x.Price).ToList(); break;
+                    case "date_desc": values = values.OrderByDescending(x => x.CreatedDate).ToList(); break;
+                    case "date_asc": values = values.OrderBy(x => x.CreatedDate).ToList(); break;
+                    default: values = values.OrderByDescending(x => x.CreatedDate).ToList(); break;
+                }
+            }
+
             ViewBag.CurrentType = type;
+            ViewBag.CurrentSort = sort;
+            ViewBag.CurrentCity = city;
+            ViewBag.CurrentMinPrice = minPrice;
+            ViewBag.CurrentMaxPrice = maxPrice;
+            ViewBag.CurrentRoomCount = roomCount;
 
             return View(values);
         }
 
-        // --- 2. EKLEME SAYFASI (CREATE GET) ---
         [HttpGet]
         public IActionResult Create()
         {
             if (!_authService.IsAuthenticated())
-            {
                 return RedirectToAction("Login", "Auth", new { returnUrl = Url.Action("Create", "Listing") });
-            }
             return View();
         }
 
-        // --- 3. EKLEME İŞLEMİ (CREATE POST) ---
+        // --- DEDEKTİF MODU EKLENMİŞ CREATE METODU ---
         [HttpPost]
         public async Task<IActionResult> Create(CreateListingViewModel model)
         {
-            if (!_authService.IsAuthenticated())
-            {
-                return RedirectToAction("Login", "Auth");
-            }
+            if (!_authService.IsAuthenticated()) return RedirectToAction("Login", "Auth");
 
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
+            var currentUser = _authService.GetCurrentUser();
+            model.UserId = currentUser?.Id ?? 0;
 
-            bool result = await _apiService.CreateListingAsync(model);
+            // --- DEDEKTİF MODU BAŞLANGIÇ ---
+            Console.WriteLine("--------------------------------------------------");
+            Console.WriteLine($"[WEB DEBUG] Formdan Gelen Başlık: {model.Title}");
+            Console.WriteLine($"[WEB DEBUG] Formdan Gelen Oda Sayısı: '{model.RoomCount}'"); 
+            Console.WriteLine($"[WEB DEBUG] Formdan Gelen Metrekare: {model.SquareMeters}");
+            Console.WriteLine("--------------------------------------------------");
+            // --- DEDEKTİF MODU BİTİŞ ---
+            
+            var (success, errorMsg) = await _apiService.CreateListingAsync(model);
 
-            if (result)
+            if (success)
             {
-                TempData["SuccessMessage"] = "Ilan basariyla olusturuldu!";
+                TempData["SuccessMessage"] = "İlan başarıyla oluşturuldu!";
                 return RedirectToAction("Index");
             }
 
-            ModelState.AddModelError("", "Ilan olusturulurken bir hata olustu. Lutfen tekrar deneyin.");
+            if (!string.IsNullOrEmpty(errorMsg)) ModelState.AddModelError("", $"API Hatası: {errorMsg}");
+            else ModelState.AddModelError("", "Bilinmeyen bir hata oluştu.");
+
             return View(model);
         }
 
-        // --- 4. DÜZENLEME SAYFASI (EDIT GET) ---
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            if (!_authService.IsAuthenticated())
-            {
-                return RedirectToAction("Login", "Auth", new { returnUrl = Url.Action("Edit", "Listing", new { id }) });
-            }
+            if (!_authService.IsAuthenticated()) return RedirectToAction("Login", "Auth");
 
             var value = await _apiService.GetListingByIdAsync(id);
+            if (value == null) return NotFound();
 
-            // Gelen veriyi forma dolduruyoruz
             var model = new CreateListingViewModel
             {
-                Title = value.Title,
-                City = value.City,
+                Title = value.Title ?? "",
+                City = value.City ?? "",
                 Price = value.Price,
                 Description = value.Description,
-
-                // --- EKLENEN KISIMLAR ---
-                Type = value.Type,             // <-- ÖNEMLİ: Radyo butonu doğru seçilsin
-                RoomCount = value.RoomCount,   // <-- Diğer eksik bilgiler
-                SquareMeters = value.SquareMeters
-                // -------------------------
+                Type = value.Type,
+                RoomCount = value.RoomCount?.Trim(), 
+                SquareMeters = value.SquareMeters,
+                UserId = value.UserId ?? 0,
+                ImageUrl = value.ImageUrl
             };
 
             ViewBag.Id = id;
             ViewBag.CurrentImage = value.ImageUrl;
-
             return View(model);
         }
 
-        // --- 5. DÜZENLEME KAYDETME (EDIT POST) ---
         [HttpPost]
         public async Task<IActionResult> Edit(int id, CreateListingViewModel model)
         {
-            if (!_authService.IsAuthenticated())
-            {
-                return RedirectToAction("Login", "Auth");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                // Hata durumunda resmi tekrar göstermek için
-                ViewBag.Id = id;
-                return View(model);
-            }
-
+            if (!_authService.IsAuthenticated()) return RedirectToAction("Login", "Auth");
+            
             bool result = await _apiService.UpdateListingAsync(id, model);
+            
+            if (result) return RedirectToAction("Index");
 
-            if (result)
-            {
-                TempData["SuccessMessage"] = "Ilan basariyla guncellendi!";
-                return RedirectToAction("Index");
-            }
-
-            ModelState.AddModelError("", "Ilan guncellenirken bir hata olustu. Bu ilani duzenleme yetkiniz olmayabilir.");
+            ModelState.AddModelError("", "Güncelleme başarısız.");
             ViewBag.Id = id;
             return View(model);
         }
 
-        // --- 6. SİLME İŞLEMİ (DELETE) ---
-        // Not: Index sayfasında <a> etiketi kullandığımız için HttpPost'u kaldırdık veya HttpGet yaptık.
         public async Task<IActionResult> Delete(int id)
         {
-            if (!_authService.IsAuthenticated())
-            {
-                return RedirectToAction("Login", "Auth");
-            }
-
+            if (!_authService.IsAuthenticated()) return RedirectToAction("Login", "Auth");
             var (success, errorMessage) = await _apiService.DeleteListingAsync(id);
-
-            if (success)
-            {
-                TempData["SuccessMessage"] = "Ilan basariyla silindi!";
-            }
-            else
-            {
-                TempData["ErrorMessage"] = errorMessage ?? "Ilan silinirken bir hata olustu.";
-            }
-
+            if (success) TempData["SuccessMessage"] = "Silindi!";
+            else TempData["ErrorMessage"] = errorMessage;
             return RedirectToAction("Index");
         }
 
-        // --- 7. DETAY SAYFASI ---
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
             var listing = await _apiService.GetListingByIdAsync(id);
-            if (listing == null || listing.Id == 0)
-            {
-                return NotFound();
-            }
+            if (listing == null) return NotFound();
             return View(listing);
         }
 
-        // --- 8. ILANLARIM SAYFASI ---
         [HttpGet]
         public async Task<IActionResult> MyListings()
         {
-            if (!_authService.IsAuthenticated())
-            {
-                return RedirectToAction("Login", "Auth", new { returnUrl = Url.Action("MyListings", "Listing") });
-            }
-
+            if (!_authService.IsAuthenticated()) return RedirectToAction("Login", "Auth");
             var listings = await _apiService.GetMyListingsAsync();
             return View(listings);
         }
