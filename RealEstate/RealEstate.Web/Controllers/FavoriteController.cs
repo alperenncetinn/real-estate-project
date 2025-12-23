@@ -45,5 +45,22 @@ namespace RealEstate.Web.Controllers
                 ? Redirect(returnUrl)
                 : RedirectToAction(nameof(Index));
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Remove(int listingId, string? returnUrl)
+        {
+            if (!_authService.IsAuthenticated())
+                return RedirectToAction("Login", "Auth", new { returnUrl });
+
+            var ok = await _favoriteService.RemoveFromFavoritesAsync(listingId);
+
+            if (!ok)
+                TempData["Error"] = "Favorilerden kaldırma başarısız (API 401/403 dönüyor olabilir).";
+
+            return !string.IsNullOrWhiteSpace(returnUrl)
+                ? Redirect(returnUrl)
+                : RedirectToAction(nameof(Index));
+        }
     }
 }

@@ -48,12 +48,16 @@
                                 <a asp-controller="Listing" asp-action="Details" asp-route-id="@item.Id"
                                    class="btn btn-outline-primary btn-sm">Detayları Gör</a>
 
-                                <form asp-controller="Favorites" asp-action="Remove" method="post">
+                                <form asp-controller="Favorite" asp-action="Remove" method="post">
+                                    @Html.AntiForgeryToken()
                                     <input type="hidden" name="listingId" value="@item.Id" />
+                                    <input type="hidden" name="returnUrl" value="@($"{Context.Request.Path}{Context.Request.QueryString}")" />
+
                                     <button type="submit" class="btn btn-outline-danger btn-sm">
                                         💔 Favorilerden Çıkar
                                     </button>
                                 </form>
+
                             </div>
                         </div>
 
