@@ -24,8 +24,9 @@ namespace RealEstate.Web.Controllers
 
         // --- 1. INDEX (FİLTRELEME) ---
         [HttpGet]
-        public async Task<IActionResult> Index(string? type, string? sort, string? city, int? minPrice, int? maxPrice, string? roomCount)
+        public async Task<IActionResult> Index(string? type, string? sort, string? city, int? minPrice, int? maxPrice, string? roomCount, int page = 1)
         {
+            const int pageSize = 9;
             Console.WriteLine("=== FİLTRELEME DEBUG ===");
             Console.WriteLine($"Type: {type ?? "NULL"}");
             Console.WriteLine($"Sort: {sort ?? "NULL"}");
@@ -33,11 +34,13 @@ namespace RealEstate.Web.Controllers
             Console.WriteLine($"MinPrice: {minPrice?.ToString() ?? "NULL"}");
             Console.WriteLine($"MaxPrice: {maxPrice?.ToString() ?? "NULL"}");
             Console.WriteLine($"RoomCount: {roomCount ?? "NULL"}");
+            Console.WriteLine($"Page: {page}");
 
-            var values = await _apiService.GetAllListingsAsync(type);
-            if (values == null) values = new List<ListingViewModel>();
+            // İlk sayfada, filtresiz veya filtreliyse API'den al
+            var pagedResult = await _apiService.GetAllListingsAsync(type, page, pageSize);
+            var values = pagedResult.Items ?? new List<ListingViewModel>();
 
-            Console.WriteLine($"API'den gelen toplam ilan sayısı: {values.Count}");
+            Console.WriteLine($"API'den gelen ilan sayısı: {values.Count}, Toplam: {pagedResult.TotalCount}");
 
             if (!string.IsNullOrEmpty(city))
             {
@@ -79,12 +82,22 @@ namespace RealEstate.Web.Controllers
             Console.WriteLine($"Son olarak View'e gönderilen ilan sayısı: {values.Count}");
             Console.WriteLine("=== FİLTRELEME DEBUG BİTİŞ ===");
 
+            // Pagination bilgisini View'e gönder
+            var paginationModel = new PaginationViewModel<ListingViewModel>
+            {
+                Items = values,
+                PageNumber = page,
+                PageSize = pageSize,
+                TotalCount = pagedResult.TotalCount
+            };
+
             ViewBag.CurrentType = type;
             ViewBag.CurrentSort = sort;
             ViewBag.CurrentCity = city;
             ViewBag.CurrentMinPrice = minPrice;
             ViewBag.CurrentMaxPrice = maxPrice;
             ViewBag.CurrentRoomCount = roomCount;
+            ViewBag.CurrentPage = page;
 
             ViewBag.TypeOptions = new List<SelectListItem>
             {
@@ -114,7 +127,7 @@ namespace RealEstate.Web.Controllers
                 new() { Text = "Villa", Value = "Villa", Selected = roomCount == "Villa" }
             };
 
-            return View(values);
+            return View(paginationModel);
         }
 
         [HttpGet]
