@@ -8,24 +8,33 @@ builder.Services.AddControllersWithViews();
 // HttpContextAccessor for accessing cookies in services
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddHttpClient<RealEstate.Web.Services.ApiService>();
+// API Base URL (appsettings.json varsa onu kullanır, yoksa 5180'e düşer)
+var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5180/";
+if (!apiBaseUrl.EndsWith("/")) apiBaseUrl += "/";
 
-// API Client konfigürasyonu
-// Varsayılan API adresini geliştirme makinesindeki çalışan API'ye işaret edecek şekilde ayarla
-var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5001";
+// PropertyApiClient
 builder.Services.AddHttpClient<PropertyApiClient>(client =>
 {
     client.BaseAddress = new Uri(apiBaseUrl);
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
-builder.Services.AddHttpClient<RealEstate.Web.Services.ApiService>(client =>
+
+// ApiService
+builder.Services.AddHttpClient<ApiService>(client =>
 {
-    // Buradaki adres senin API'nin çalıştığı port olmalı (5180)
     client.BaseAddress = new Uri(apiBaseUrl);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 
 // Auth Service
 builder.Services.AddHttpClient<AuthService>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+});
+
+// Favorite Service (TEK KERE!)
+builder.Services.AddHttpClient<FavoriteService>(client =>
 {
     client.BaseAddress = new Uri(apiBaseUrl);
     client.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -44,7 +53,6 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 

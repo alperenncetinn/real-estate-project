@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RealEstate.Api.Data;
 
@@ -10,9 +11,11 @@ using RealEstate.Api.Data;
 namespace RealEstate.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251222232930_AddFavorites")]
+    partial class AddFavorites
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.11");
@@ -26,7 +29,7 @@ namespace RealEstate.Api.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("ListingId")
+                    b.Property<int>("PropertyId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("UserId")
@@ -34,9 +37,9 @@ namespace RealEstate.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ListingId");
+                    b.HasIndex("PropertyId");
 
-                    b.HasIndex("UserId", "ListingId")
+                    b.HasIndex("UserId", "PropertyId")
                         .IsUnique();
 
                     b.ToTable("Favorites");
@@ -268,9 +271,9 @@ namespace RealEstate.Api.Migrations
 
             modelBuilder.Entity("RealEstate.Api.Entities.Favorite", b =>
                 {
-                    b.HasOne("RealEstate.Api.Entities.Listing", "Listing")
+                    b.HasOne("RealEstate.Api.Models.Property", "Property")
                         .WithMany()
-                        .HasForeignKey("ListingId")
+                        .HasForeignKey("PropertyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -280,7 +283,7 @@ namespace RealEstate.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Listing");
+                    b.Navigation("Property");
 
                     b.Navigation("User");
                 });

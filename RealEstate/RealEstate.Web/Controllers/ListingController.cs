@@ -12,11 +12,13 @@ namespace RealEstate.Web.Controllers
     {
         private readonly ApiService _apiService;
         private readonly AuthService _authService;
+        private readonly FavoriteService _favoriteService;
 
-        public ListingController(ApiService apiService, AuthService authService)
+        public ListingController(ApiService apiService, AuthService authService, FavoriteService favoriteService)
         {
             _apiService = apiService;
             _authService = authService;
+            _favoriteService = favoriteService;
         }
 
         // --- 1. INDEX (FİLTRELEME) ---
@@ -169,5 +171,23 @@ namespace RealEstate.Web.Controllers
             var listings = await _apiService.GetMyListingsAsync();
             return View(listings);
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+      
+        public async Task<IActionResult> AddToFavorites(int listingId, string? returnUrl)
+        {
+            if (!_authService.IsAuthenticated())
+                return RedirectToAction("Login", "Auth", new { returnUrl = returnUrl ?? Url.Action("Index", "Listing") });
+
+            await _favoriteService.AddToFavoritesAsync(listingId);
+
+            if (!string.IsNullOrWhiteSpace(returnUrl))
+                return Redirect(returnUrl);
+
+            return RedirectToAction("Index");
+        }
+
+
+
     }
 }

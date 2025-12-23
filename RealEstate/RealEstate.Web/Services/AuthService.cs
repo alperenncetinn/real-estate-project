@@ -102,8 +102,8 @@ namespace RealEstate.Web.Services
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Secure = false, // Development için false, Production'da true olmalı
-                SameSite = SameSiteMode.Lax, // Lax daha uygun localhost için
+                Secure = true,                 
+                SameSite = SameSiteMode.Lax,
                 Expires = rememberMe ? DateTimeOffset.UtcNow.AddDays(7) : null
             };
 
@@ -113,6 +113,7 @@ namespace RealEstate.Web.Services
             context.Response.Cookies.Append("user_name", $"{loginData.FirstName} {loginData.LastName}", cookieOptions);
             context.Response.Cookies.Append("user_role", loginData.Role, cookieOptions);
         }
+
 
         public void ClearUserSession()
         {

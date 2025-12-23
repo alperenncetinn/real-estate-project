@@ -15,10 +15,31 @@ namespace RealEstate.Api.Data
         public DbSet<Property> Properties { get; set; } = null!;
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Notification> Notifications { get; set; } = null!;
-
+        public DbSet<Favorite> Favorites { get; set; } = null!;
+ 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            //Favorite Konfigürasyonu 
+            modelBuilder.Entity<Favorite>(entity =>
+            {
+                entity.HasKey(f => f.Id);
+
+                // Aynı kullanıcı aynı ilanı 2 kere favorileyemesin
+                entity.HasIndex(f => new { f.UserId, f.ListingId }).IsUnique();
+
+                entity.HasOne(f => f.User)
+                    .WithMany()
+                    .HasForeignKey(f => f.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(f => f.Listing)
+                    .WithMany()
+                    .HasForeignKey(f => f.ListingId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
 
             // User entity konfigürasyonu
             modelBuilder.Entity<User>(entity =>
@@ -83,6 +104,7 @@ namespace RealEstate.Api.Data
                 entity.Property(e => e.Price).HasColumnType("decimal(18,2)");
                 entity.Property(e => e.ImageUrl).HasMaxLength(500).IsRequired();
             });
+           
 
             // Seed data - başlangıç verileri
             modelBuilder.Entity<Property>().HasData(
@@ -108,6 +130,7 @@ namespace RealEstate.Api.Data
                     Area = 140,
                     ImageUrl = "https://placehold.co/600x400?text=House+2"
                 }
+
             );
         }
     }
