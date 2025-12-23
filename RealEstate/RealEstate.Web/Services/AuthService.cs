@@ -58,7 +58,8 @@ namespace RealEstate.Web.Services
                     email = model.Email,
                     password = model.Password,
                     firstName = model.FirstName,
-                    lastName = model.LastName
+                    lastName = model.LastName,
+                    phoneNumber = model.PhoneNumber
                 });
 
                 if (response.IsSuccessStatusCode)
@@ -102,7 +103,7 @@ namespace RealEstate.Web.Services
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,                 
+                Secure = true,
                 SameSite = SameSiteMode.Lax,
                 Expires = rememberMe ? DateTimeOffset.UtcNow.AddDays(7) : null
             };
@@ -174,6 +175,74 @@ namespace RealEstate.Web.Services
         {
             var context = _httpContextAccessor.HttpContext;
             return context?.Request.Cookies["auth_token"];
+        }
+
+        public async Task<ProfileViewModel?> GetProfileAsync()
+        {
+            try
+            {
+                var token = GetToken();
+                if (string.IsNullOrEmpty(token)) return null;
+
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.GetAsync("api/auth/me");
+                if (response.IsSuccessStatusCode)
+                {
+                    var user = await response.Content.ReadFromJsonAsync<ProfileViewModel>();
+                    return user;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetProfile error");
+                return null;
+            }
+        }
+
+        public async Task<(bool Success, string? ErrorMessage)> UpdateProfileAsync(ProfileViewModel model)
+        {
+            try
+            {
+                var token = GetToken();
+                if (string.IsNullOrEmpty(token))
+                    return (false, "Oturum açmanız gerekiyor.");
+
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.PutAsJsonAsync("api/auth/profile", new
+                {
+                    firstName = model.FirstName,
+                    lastName = model.LastName,
+                    phoneNumber = model.PhoneNumber
+                });
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return (true, null);
+                }
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                try
+                {
+                    var errorObj = JsonSerializer.Deserialize<JsonElement>(errorContent);
+                    if (errorObj.TryGetProperty("message", out var messageElement))
+                    {
+                        return (false, messageElement.GetString());
+                    }
+                }
+                catch { }
+
+                return (false, "Profil güncellenemedi.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "UpdateProfile error");
+                return (false, "Bir hata oluştu. Lütfen daha sonra tekrar deneyin.");
+            }
         }
     }
 }

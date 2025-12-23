@@ -76,6 +76,7 @@ namespace RealEstate.Api.Controllers
                 PasswordHash = HashPassword(request.Password),
                 FirstName = request.FirstName,
                 LastName = request.LastName,
+                PhoneNumber = request.PhoneNumber,
                 Role = "User",
                 CreatedDate = DateTime.UtcNow,
                 IsActive = true
@@ -124,10 +125,35 @@ namespace RealEstate.Api.Controllers
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber,
                 Role = user.Role,
                 CreatedDate = user.CreatedDate,
                 IsActive = user.IsActive
             });
+        }
+
+        [HttpPut("profile")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDto dto)
+        {
+            if (dto == null)
+                return BadRequest(new { message = "Request body cannot be null." });
+
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+                return Unauthorized(new { message = "Invalid token." });
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                return NotFound(new { message = "User not found." });
+
+            user.FirstName = dto.FirstName;
+            user.LastName = dto.LastName;
+            user.PhoneNumber = dto.PhoneNumber;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Profil güncellendi." });
         }
 
         // ==================== ADMIN ENDPOINTS ====================

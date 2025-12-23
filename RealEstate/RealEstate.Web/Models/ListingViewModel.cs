@@ -19,6 +19,7 @@ namespace RealEstate.Web.Models
         public int? UserId { get; set; }
         public bool IsActive { get; set; } = true;
         public string? OwnerName { get; set; }
+        public string? OwnerPhone { get; set; }
         public string? DeactivationReason { get; set; }
         public DateTime? DeactivatedAt { get; set; }
     }

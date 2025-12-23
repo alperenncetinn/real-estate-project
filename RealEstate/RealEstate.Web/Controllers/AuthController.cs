@@ -96,5 +96,48 @@ namespace RealEstate.Web.Controllers
         {
             return View();
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Profile()
+        {
+            if (!_authService.IsAuthenticated())
+            {
+                return RedirectToAction("Login");
+            }
+
+            var profile = await _authService.GetProfileAsync();
+            if (profile == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            return View(profile);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Profile(ProfileViewModel model)
+        {
+            if (!_authService.IsAuthenticated())
+            {
+                return RedirectToAction("Login");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var (success, errorMessage) = await _authService.UpdateProfileAsync(model);
+
+            if (success)
+            {
+                TempData["SuccessMessage"] = "Profil başarıyla güncellendi.";
+                return RedirectToAction("Profile");
+            }
+
+            ModelState.AddModelError(string.Empty, errorMessage ?? "Profil güncellenemedi.");
+            return View(model);
+        }
     }
 }

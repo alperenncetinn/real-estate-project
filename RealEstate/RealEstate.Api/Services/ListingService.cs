@@ -271,6 +271,7 @@ namespace RealEstate.Api.Services
                 UserId = listing.UserId,
                 IsActive = listing.IsActive,
                 OwnerName = listing.Owner != null ? listing.Owner.FirstName + " " + listing.Owner.LastName : null,
+                OwnerPhone = listing.Owner?.PhoneNumber,
                 DeactivationReason = listing.DeactivationReason,
                 DeactivatedAt = listing.DeactivatedAt
             };

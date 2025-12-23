@@ -12,7 +12,7 @@
             <div class="card-body">
                 <form asp-action="Register" method="post">
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-                    
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label asp-for="FirstName" class="form-label"></label>
@@ -25,32 +25,39 @@
                             <span asp-validation-for="LastName" class="text-danger"></span>
                         </div>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label asp-for="Email" class="form-label"></label>
                         <input asp-for="Email" class="form-control" placeholder="ornek@email.com" />
                         <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
-                    
+
+                    <div class="mb-3">
+                        <label asp-for="PhoneNumber" class="form-label"></label>
+                        <input asp-for="PhoneNumber" class="form-control" placeholder="05XX XXX XX XX" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        <small class="text-muted">İlan sahipliğinde görüntülenmek için telefon numaranızı girin.</small>
+                    </div>
+
                     <div class="mb-3">
                         <label asp-for="Password" class="form-label"></label>
                         <input asp-for="Password" class="form-control" placeholder="En az 6 karakter" />
                         <span asp-validation-for="Password" class="text-danger"></span>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label asp-for="ConfirmPassword" class="form-label"></label>
                         <input asp-for="ConfirmPassword" class="form-control" placeholder="Şifrenizi tekrar girin" />
                         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                     </div>
-                    
+
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-success">Kayıt Ol</button>
                     </div>
                 </form>
-                
+
                 <hr />
-                
+
                 <div class="text-center">
                     <p class="mb-0">Zaten hesabınız var mı? <a asp-action="Login">Giriş Yap</a></p>
                 </div>
