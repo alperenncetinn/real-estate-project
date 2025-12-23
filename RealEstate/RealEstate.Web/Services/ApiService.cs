@@ -38,24 +38,57 @@ namespace RealEstate.Web.Services
             }
         }
 
-        public async Task<List<ListingViewModel>> GetAllListingsAsync(string? type = null)
+        public async Task<PaginationViewModel<ListingViewModel>> GetAllListingsAsync(string? type = null, int page = 1, int pageSize = 9)
         {
-            var url = "api/listings";
-            if (!string.IsNullOrEmpty(type)) url += $"?type={type}";
+            var url = $"api/listings?page={page}&pageSize={pageSize}";
+            if (!string.IsNullOrEmpty(type)) url += $"&type={type}";
 
             Console.WriteLine($"[ApiService] API'ye istek atılıyor: {url}");
 
             try
             {
-                var result = await _httpClient.GetFromJsonAsync<List<ListingViewModel>>(url) ?? new List<ListingViewModel>();
-                Console.WriteLine($"[ApiService] API'den {result.Count} ilan döndü");
-                return result;
+                var result = await _httpClient.GetFromJsonAsync<PagedListingsResponse>(url);
+                
+                if (result == null || result.Items == null)
+                {
+                    Console.WriteLine("[ApiService] API null döndü");
+                    return new PaginationViewModel<ListingViewModel>
+                    {
+                        Items = new List<ListingViewModel>(),
+                        PageNumber = page,
+                        PageSize = pageSize,
+                        TotalCount = 0
+                    };
+                }
+
+                var response = new PaginationViewModel<ListingViewModel>
+                {
+                    Items = result.Items,
+                    PageNumber = result.PageNumber,
+                    PageSize = result.PageSize,
+                    TotalCount = result.TotalCount
+                };
+
+                Console.WriteLine($"[ApiService] API'den {result.Items.Count} ilan döndü, Toplam: {response.TotalCount}, Sayfa: {page}/{response.TotalPages}");
+                return response;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ApiService] API çağrısında hata: {ex.Message}");
-                return new List<ListingViewModel>();
+                Console.WriteLine($"[ApiService] API çağrısında hata: {ex.Message}\n{ex.StackTrace}");
+                return new PaginationViewModel<ListingViewModel>
+                {
+                    Items = new List<ListingViewModel>(),
+                    PageNumber = page,
+                    PageSize = pageSize,
+                    TotalCount = 0
+                };
             }
+        }
+
+        public async Task<List<ListingViewModel>> GetAllListingsAsync(string? type = null)
+        {
+            var result = await GetAllListingsAsync(type, 1, 9);
+            return result.Items;
         }
 
         public async Task<ListingViewModel> GetListingByIdAsync(int id)

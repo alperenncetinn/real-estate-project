@@ -1,5 +1,5 @@
 @using Microsoft.AspNetCore.Mvc.Rendering
-@model List<RealEstate.Web.Models.ListingViewModel>
+@model RealEstate.Web.Models.PaginationViewModel<RealEstate.Web.Models.ListingViewModel>
 @inject RealEstate.Web.Services.AuthService AuthService
 
 @{
@@ -90,7 +90,7 @@
         </div>
 
         <div class="col-md-8 col-lg-9">
-            @if (Model == null || Model.Count == 0)
+            @if (Model == null || Model.Items.Count == 0)
             {
                 <div class="alert alert-warning text-center p-5 rounded empty-state">
                     <h4 class="mb-2">🔍 İlan Bulunamadı</h4>
@@ -100,7 +100,7 @@
             else
             {
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4 listing-grid">
-                    @foreach (var item in Model)
+                    @foreach (var item in Model.Items)
                     {
                         <div class="col">
                             <div class="card listing-card h-100">
@@ -185,6 +185,86 @@
                         </div>
                     }
                 </div>
+
+                <!-- PAGINATION CONTROLS -->
+                @if (Model.TotalPages > 1)
+                {
+                    <nav class="mt-5" aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            <!-- Previous Page -->
+                            @if (Model.HasPreviousPage)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" 
+                                       asp-action="Index"
+                                       asp-route-page="@(Model.PageNumber - 1)"
+                                       asp-route-type="@ViewBag.CurrentType"
+                                       asp-route-sort="@ViewBag.CurrentSort"
+                                       asp-route-city="@ViewBag.CurrentCity"
+                                       asp-route-minPrice="@ViewBag.CurrentMinPrice"
+                                       asp-route-maxPrice="@ViewBag.CurrentMaxPrice"
+                                       asp-route-roomCount="@ViewBag.CurrentRoomCount">
+                                        <i class="bi bi-chevron-left"></i> Önceki
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item disabled">
+                                    <span class="page-link"><i class="bi bi-chevron-left"></i> Önceki</span>
+                                </li>
+                            }
+
+                            <!-- Page Numbers -->
+                            @for (int i = 1; i <= Model.TotalPages; i++)
+                            {
+                                var isActive = (i == Model.PageNumber);
+                                <li class="page-item @(isActive ? "active" : "")">
+                                    <a class="page-link" 
+                                       asp-action="Index"
+                                       asp-route-page="@i"
+                                       asp-route-type="@ViewBag.CurrentType"
+                                       asp-route-sort="@ViewBag.CurrentSort"
+                                       asp-route-city="@ViewBag.CurrentCity"
+                                       asp-route-minPrice="@ViewBag.CurrentMinPrice"
+                                       asp-route-maxPrice="@ViewBag.CurrentMaxPrice"
+                                       asp-route-roomCount="@ViewBag.CurrentRoomCount">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+
+                            <!-- Next Page -->
+                            @if (Model.HasNextPage)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" 
+                                       asp-action="Index"
+                                       asp-route-page="@(Model.PageNumber + 1)"
+                                       asp-route-type="@ViewBag.CurrentType"
+                                       asp-route-sort="@ViewBag.CurrentSort"
+                                       asp-route-city="@ViewBag.CurrentCity"
+                                       asp-route-minPrice="@ViewBag.CurrentMinPrice"
+                                       asp-route-maxPrice="@ViewBag.CurrentMaxPrice"
+                                       asp-route-roomCount="@ViewBag.CurrentRoomCount">
+                                        Sonraki <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item disabled">
+                                    <span class="page-link">Sonraki <i class="bi bi-chevron-right"></i></span>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+
+                    <div class="text-center mt-3 text-muted small">
+                        <p>Sayfa <strong>@Model.PageNumber</strong> / <strong>@Model.TotalPages</strong> 
+                           (Toplam <strong>@Model.TotalCount</strong> ilan)</p>
+                    </div>
+                }
             }
         </div>
     </div>
