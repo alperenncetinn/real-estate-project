@@ -20,35 +20,47 @@
             <div class="container-xxl">
                 <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">RealEstate.Web</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
-                    aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                        aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between" id="mainNav">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Ana
-                                Sayfa</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Ana Sayfa</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Listing" asp-action="Create">Ilan
-                                Ekle</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Listing" asp-action="Create">Ilan Ekle</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home"
-                                asp-action="Privacy">Gizlilik</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Gizlilik</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Listing"
-                                asp-action="Index">Ilanlar</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Listing" asp-action="Index">Ilanlar</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Favorite" asp-action="Index">Favoriler</a>
                         </li>
                     </ul>
+
                     <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
     </header>
+
     <div class="container-xxl app-shell">
         <main role="main" class="pb-3">
+
+            @* ✅ HATA MESAJI (Favoriye ekleme başarısız vs.) *@
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger">
+                    @TempData["Error"]
+                </div>
+            }
+
             @RenderBody()
         </main>
     </div>
@@ -58,6 +70,7 @@
             &copy; 2025 - RealEstate.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+
     @await Html.PartialAsync("_Loading")
     @await Html.PartialAsync("_ErrorPartial")
     @await Html.PartialAsync("_NotificationPopup")

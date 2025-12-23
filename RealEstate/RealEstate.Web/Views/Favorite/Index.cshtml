@@ -1,0 +1,69 @@
+﻿@model List<RealEstate.Web.Models.ListingViewModel>
+@inject RealEstate.Web.Services.AuthService AuthService
+
+@{
+    ViewData["Title"] = "Favorilerim";
+}
+
+<div class="container-xxl mt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="mb-1">💗 Favorilerim</h2>
+            <p class="text-muted mb-0 small">Favorilediğin ilanları burada görürsün.</p>
+        </div>
+        <a asp-controller="Listing" asp-action="Index" class="btn btn-outline-secondary">← İlanlara Dön</a>
+    </div>
+
+    @if (Model == null || Model.Count == 0)
+    {
+        <div class="alert alert-warning text-center p-4 rounded">
+            Henüz favori eklemedin.
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col">
+                    <div class="card h-100">
+                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                        {
+                            <img src="http://localhost:5180@(item.ImageUrl)" class="card-img-top" style="height:200px;object-fit:cover;" />
+                        }
+
+                        <div class="card-body">
+                            <h5 class="card-title text-truncate" title="@item.Title">@item.Title</h5>
+                            <div class="text-muted small mb-2">
+                                <i class="bi bi-geo-alt-fill text-danger"></i> @item.City / @(item.District ?? "-")
+                            </div>
+                            <div class="d-flex justify-content-between text-muted small mb-2">
+                                <span><i class="bi bi-door-open"></i> @(item.RoomCount ?? "-")</span>
+                                <span><i class="bi bi-aspect-ratio"></i> @item.SquareMeters m²</span>
+                            </div>
+
+                            <div class="fw-bold text-primary mb-3">@item.Price.ToString("N0") ₺</div>
+
+                            <div class="d-grid gap-2">
+                                <a asp-controller="Listing" asp-action="Details" asp-route-id="@item.Id"
+                                   class="btn btn-outline-primary btn-sm">Detayları Gör</a>
+
+                                <form asp-controller="Favorites" asp-action="Remove" method="post">
+                                    <input type="hidden" name="listingId" value="@item.Id" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        💔 Favorilerden Çıkar
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-white text-muted small d-flex justify-content-between">
+                            <span><i class="bi bi-clock"></i> @item.CreatedDate.ToString("dd.MM.yyyy")</span>
+                            <span class="badge @(item.Type == "Kiralık" ? "bg-warning text-dark" : "bg-success")">@item.Type</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

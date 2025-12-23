@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "Yeni Profil",
+    "Projects": [
+      {
+        "Path": "RealEstate.Api\\RealEstate.Api.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "RealEstate.Web\\RealEstate.Web.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
