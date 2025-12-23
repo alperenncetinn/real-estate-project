@@ -37,6 +37,10 @@ namespace RealEstate.Web.Models
         [Display(Name = "Email")]
         public string Email { get; set; } = string.Empty;
 
+        [Phone(ErrorMessage = "Geçerli bir telefon numarası giriniz.")]
+        [Display(Name = "Telefon Numarası")]
+        public string? PhoneNumber { get; set; }
+
         [Required(ErrorMessage = "Şifre gereklidir.")]
         [StringLength(100, MinimumLength = 6, ErrorMessage = "Şifre en az 6 karakter olmalıdır.")]
         [DataType(DataType.Password)]
@@ -55,8 +59,29 @@ namespace RealEstate.Web.Models
         public string Email { get; set; } = string.Empty;
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
+        public string? PhoneNumber { get; set; }
         public string Role { get; set; } = string.Empty;
         public string FullName => $"{FirstName} {LastName}";
+    }
+
+    public class ProfileViewModel
+    {
+        [Required(ErrorMessage = "Ad gereklidir.")]
+        [StringLength(100, ErrorMessage = "Ad en fazla 100 karakter olabilir.")]
+        [Display(Name = "Ad")]
+        public string FirstName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Soyad gereklidir.")]
+        [StringLength(100, ErrorMessage = "Soyad en fazla 100 karakter olabilir.")]
+        [Display(Name = "Soyad")]
+        public string LastName { get; set; } = string.Empty;
+
+        [Display(Name = "Email")]
+        public string Email { get; set; } = string.Empty;
+
+        [Phone(ErrorMessage = "Geçerli bir telefon numarası giriniz.")]
+        [Display(Name = "Telefon Numarası")]
+        public string? PhoneNumber { get; set; }
     }
 
     public class LoginResponseDto

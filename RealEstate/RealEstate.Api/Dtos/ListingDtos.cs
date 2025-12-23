@@ -34,6 +34,7 @@ namespace RealEstate.Api.Dtos
         public int? UserId { get; set; }
         public bool IsActive { get; set; }
         public string? OwnerName { get; set; }
+        public string? OwnerPhone { get; set; }
         public string? DeactivationReason { get; set; }
         public DateTime? DeactivatedAt { get; set; }
     }

@@ -1,5 +1,7 @@
 @model RealEstate.Web.Models.ListingViewModel
-@{ ViewData["Title"] = Model.Title; }
+@{
+    ViewData["Title"] = Model.Title;
+}
 
 <div class="container mt-4">
     <nav aria-label="breadcrumb" class="mb-4">
@@ -14,12 +16,12 @@
             @if (!string.IsNullOrEmpty(Model.ImageUrl))
             {
                 <img src="@Model.ImageUrl" alt="@Model.Title" class="img-fluid rounded shadow w-100"
-                     style="max-height: 500px; object-fit: cover;">
+                    style="max-height: 500px; object-fit: cover;">
             }
             else
             {
                 <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded shadow"
-                     style="height: 400px;">
+                    style="height: 400px;">
                     <span class="fs-4">Resim Yok</span>
                 </div>
             }
@@ -42,23 +44,26 @@
                     <ul class="list-group list-group-flush mb-3">
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                             <span class="text-muted">İlan Türü</span>
-                            <span class="badge @(Model.Type == "Satılık" ? "bg-success" : "bg-info") rounded-pill">@Model.Type</span>
+                            <span
+                                class="badge @(Model.Type == "Satılık" ? "bg-success" : "bg-info") rounded-pill">@Model.Type</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                             <span class="text-muted">Şehir / İlçe</span>
-                            <span class="fw-bold">@Model.City @(!string.IsNullOrEmpty(Model.District) ? " / " + Model.District : "")</span>
+                            <span class="fw-bold">@Model.City @(!string.IsNullOrEmpty(Model.District) ? " / " +
+                                                                Model.District : "")</span>
                         </li>
-                        
+
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                             <span class="text-muted">Oda Sayısı</span>
-                            <span class="fw-bold">@(string.IsNullOrEmpty(Model.RoomCount) ? "Belirtilmemiş" : Model.RoomCount)</span>
+                            <span class="fw-bold">@(string.IsNullOrEmpty(Model.RoomCount) ? "Belirtilmemiş" :
+                                                                Model.RoomCount)</span>
                         </li>
 
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                             <span class="text-muted">Metrekare</span>
                             <span class="fw-bold">@Model.SquareMeters m²</span>
                         </li>
-                        
+
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                             <span class="text-muted">İlan Tarihi</span>
                             <span>@Model.CreatedDate.ToString("dd.MM.yyyy")</span>
@@ -66,9 +71,17 @@
 
                         @if (!string.IsNullOrEmpty(Model.OwnerName))
                         {
-                             <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                                 <span class="text-muted">İlan Sahibi</span>
                                 <span class="fw-bold">@Model.OwnerName</span>
+                            </li>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.OwnerPhone))
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span class="text-muted"><i class="bi bi-telephone"></i> İletişim</span>
+                                <a href="tel:@Model.OwnerPhone" class="fw-bold text-decoration-none">@Model.OwnerPhone</a>
                             </li>
                         }
                     </ul>
@@ -80,7 +93,7 @@
                             <small>Neden: @Model.DeactivationReason</small>
                         </div>
                     }
-                    
+
                     <a asp-action="Index" class="btn btn-outline-primary w-100 mt-2">Geri Dön</a>
                 </div>
             </div>

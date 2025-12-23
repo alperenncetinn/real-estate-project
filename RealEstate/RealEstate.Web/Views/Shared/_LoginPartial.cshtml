@@ -67,7 +67,10 @@
                 <li>
                     <hr class="dropdown-divider">
                 </li>
-                <li><a class="dropdown-item" asp-controller="Listing" asp-action="MyListings">Ilanlarim</a></li>
+                <li><a class="dropdown-item" asp-controller="Auth" asp-action="Profile"><i
+                            class="bi bi-person-circle me-2"></i>Profilim</a></li>
+                <li><a class="dropdown-item" asp-controller="Listing" asp-action="MyListings"><i
+                            class="bi bi-house-door me-2"></i>Ilanlarim</a></li>
                 @if (isAdmin)
                 {
                     <li><a class="dropdown-item" asp-controller="Admin" asp-action="Listings">Ilan Yonetimi</a></li>
@@ -126,18 +129,18 @@
                     const typeClass = n.type === 'warning' ? 'bg-warning' : n.type === 'success' ? 'bg-success' : 'bg-info';
                     const readClass = n.isRead ? 'opacity-50' : '';
                     html += `
-                            <a href="#" class="dropdown-item ${readClass}" onclick="handleNotificationClick(${n.id}, ${n.listingId}); return false;">
-                                <div class="d-flex align-items-start">
-                                    <span class="badge ${typeClass} me-2 mt-1">&nbsp;</span>
-                                    <div class="flex-grow-1">
-                                        <div class="fw-bold small">${n.title}</div>
-                                        <div class="small text-muted text-wrap">${n.message}</div>
-                                        <div class="small text-muted">${new Date(n.createdAt).toLocaleString('tr-TR')}</div>
+                                <a href="#" class="dropdown-item ${readClass}" onclick="handleNotificationClick(${n.id}, ${n.listingId}); return false;">
+                                    <div class="d-flex align-items-start">
+                                        <span class="badge ${typeClass} me-2 mt-1">&nbsp;</span>
+                                        <div class="flex-grow-1">
+                                            <div class="fw-bold small">${n.title}</div>
+                                            <div class="small text-muted text-wrap">${n.message}</div>
+                                            <div class="small text-muted">${new Date(n.createdAt).toLocaleString('tr-TR')}</div>
+                                        </div>
                                     </div>
-                                </div>
-                            </a>
-                            <hr class="dropdown-divider m-0">
-                        `;
+                                </a>
+                                <hr class="dropdown-divider m-0">
+                            `;
                 });
                 list.innerHTML = html;
             } catch (e) {
