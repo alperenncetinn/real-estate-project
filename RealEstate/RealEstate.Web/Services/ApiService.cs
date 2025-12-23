@@ -42,8 +42,20 @@ namespace RealEstate.Web.Services
         {
             var url = "api/listings";
             if (!string.IsNullOrEmpty(type)) url += $"?type={type}";
-            try { return await _httpClient.GetFromJsonAsync<List<ListingViewModel>>(url) ?? new List<ListingViewModel>(); }
-            catch { return new List<ListingViewModel>(); }
+
+            Console.WriteLine($"[ApiService] API'ye istek atılıyor: {url}");
+
+            try
+            {
+                var result = await _httpClient.GetFromJsonAsync<List<ListingViewModel>>(url) ?? new List<ListingViewModel>();
+                Console.WriteLine($"[ApiService] API'den {result.Count} ilan döndü");
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ApiService] API çağrısında hata: {ex.Message}");
+                return new List<ListingViewModel>();
+            }
         }
 
         public async Task<ListingViewModel> GetListingByIdAsync(int id)
