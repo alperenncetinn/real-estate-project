@@ -26,21 +26,42 @@ namespace RealEstate.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(string? type, string? sort, string? city, int? minPrice, int? maxPrice, string? roomCount)
         {
+            Console.WriteLine("=== FİLTRELEME DEBUG ===");
+            Console.WriteLine($"Type: {type ?? "NULL"}");
+            Console.WriteLine($"Sort: {sort ?? "NULL"}");
+            Console.WriteLine($"City: {city ?? "NULL"}");
+            Console.WriteLine($"MinPrice: {minPrice?.ToString() ?? "NULL"}");
+            Console.WriteLine($"MaxPrice: {maxPrice?.ToString() ?? "NULL"}");
+            Console.WriteLine($"RoomCount: {roomCount ?? "NULL"}");
+
             var values = await _apiService.GetAllListingsAsync(type);
             if (values == null) values = new List<ListingViewModel>();
+
+            Console.WriteLine($"API'den gelen toplam ilan sayısı: {values.Count}");
 
             if (!string.IsNullOrEmpty(city))
             {
                 var searchCity = city.Trim().ToLower();
                 values = values.Where(x => x.City != null && x.City.ToLower().Contains(searchCity)).ToList();
+                Console.WriteLine($"Şehir filtresinden sonra kalan: {values.Count}");
             }
 
-            if (minPrice.HasValue) values = values.Where(x => x.Price >= minPrice.Value).ToList();
-            if (maxPrice.HasValue) values = values.Where(x => x.Price <= maxPrice.Value).ToList();
+            if (minPrice.HasValue)
+            {
+                values = values.Where(x => x.Price >= minPrice.Value).ToList();
+                Console.WriteLine($"MinPrice filtresinden sonra kalan: {values.Count}");
+            }
+
+            if (maxPrice.HasValue)
+            {
+                values = values.Where(x => x.Price <= maxPrice.Value).ToList();
+                Console.WriteLine($"MaxPrice filtresinden sonra kalan: {values.Count}");
+            }
 
             if (!string.IsNullOrEmpty(roomCount))
             {
                 values = values.Where(x => x.RoomCount != null && x.RoomCount.Trim() == roomCount.Trim()).ToList();
+                Console.WriteLine($"RoomCount filtresinden sonra kalan: {values.Count}");
             }
 
             if (!string.IsNullOrEmpty(sort))
@@ -54,6 +75,9 @@ namespace RealEstate.Web.Controllers
                     default: values = values.OrderByDescending(x => x.CreatedDate).ToList(); break;
                 }
             }
+
+            Console.WriteLine($"Son olarak View'e gönderilen ilan sayısı: {values.Count}");
+            Console.WriteLine("=== FİLTRELEME DEBUG BİTİŞ ===");
 
             ViewBag.CurrentType = type;
             ViewBag.CurrentSort = sort;
