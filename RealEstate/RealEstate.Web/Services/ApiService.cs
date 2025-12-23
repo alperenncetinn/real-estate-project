@@ -40,18 +40,19 @@ namespace RealEstate.Web.Services
 
         public async Task<PaginationViewModel<ListingViewModel>> GetAllListingsAsync(string? type = null, int page = 1, int pageSize = 9)
         {
-            var url = $"api/listings?page={page}&pageSize={pageSize}";
-            if (!string.IsNullOrEmpty(type)) url += $"&type={type}";
+            var url = "api/listings";
+            if (!string.IsNullOrEmpty(type)) url += $"?type={type}";
 
             Console.WriteLine($"[ApiService] API'ye istek atılıyor: {url}");
 
             try
             {
-                var result = await _httpClient.GetFromJsonAsync<PagedListingsResponse>(url);
-                
-                if (result == null || result.Items == null)
+                // API düz liste dönüyor, önce listeyi al
+                var allItems = await _httpClient.GetFromJsonAsync<List<ListingViewModel>>(url);
+
+                if (allItems == null || allItems.Count == 0)
                 {
-                    Console.WriteLine("[ApiService] API null döndü");
+                    Console.WriteLine("[ApiService] API null veya boş döndü");
                     return new PaginationViewModel<ListingViewModel>
                     {
                         Items = new List<ListingViewModel>(),
@@ -61,15 +62,22 @@ namespace RealEstate.Web.Services
                     };
                 }
 
+                // Client-side pagination uygula
+                var totalCount = allItems.Count;
+                var pagedItems = allItems
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
                 var response = new PaginationViewModel<ListingViewModel>
                 {
-                    Items = result.Items,
-                    PageNumber = result.PageNumber,
-                    PageSize = result.PageSize,
-                    TotalCount = result.TotalCount
+                    Items = pagedItems,
+                    PageNumber = page,
+                    PageSize = pageSize,
+                    TotalCount = totalCount
                 };
 
-                Console.WriteLine($"[ApiService] API'den {result.Items.Count} ilan döndü, Toplam: {response.TotalCount}, Sayfa: {page}/{response.TotalPages}");
+                Console.WriteLine($"[ApiService] API'den {totalCount} ilan döndü, Sayfa {page}'de {pagedItems.Count} ilan gösteriliyor");
                 return response;
             }
             catch (Exception ex)
