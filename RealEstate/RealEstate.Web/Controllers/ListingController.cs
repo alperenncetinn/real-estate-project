@@ -1,5 +1,6 @@
 using System; // Console.WriteLine için gerekli
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using RealEstate.Web.Models;
 using RealEstate.Web.Services;
 using System.Threading.Tasks;
@@ -60,6 +61,34 @@ namespace RealEstate.Web.Controllers
             ViewBag.CurrentMinPrice = minPrice;
             ViewBag.CurrentMaxPrice = maxPrice;
             ViewBag.CurrentRoomCount = roomCount;
+
+            ViewBag.TypeOptions = new List<SelectListItem>
+            {
+                new() { Text = "Tümü", Value = "", Selected = string.IsNullOrEmpty(type) },
+                new() { Text = "Satılık", Value = "Satılık", Selected = type == "Satılık" },
+                new() { Text = "Kiralık", Value = "Kiralık", Selected = type == "Kiralık" }
+            };
+
+            ViewBag.SortOptions = new List<SelectListItem>
+            {
+                new() { Text = "En Yeni", Value = "date_desc", Selected = string.IsNullOrEmpty(sort) || sort == "date_desc" },
+                new() { Text = "En Eski", Value = "date_asc", Selected = sort == "date_asc" },
+                new() { Text = "Fiyat Artan", Value = "price_asc", Selected = sort == "price_asc" },
+                new() { Text = "Fiyat Azalan", Value = "price_desc", Selected = sort == "price_desc" }
+            };
+
+            ViewBag.RoomOptions = new List<SelectListItem>
+            {
+                new() { Text = "Tümü", Value = "", Selected = string.IsNullOrEmpty(roomCount) },
+                new() { Text = "1+0", Value = "1+0", Selected = roomCount == "1+0" },
+                new() { Text = "1+1", Value = "1+1", Selected = roomCount == "1+1" },
+                new() { Text = "2+1", Value = "2+1", Selected = roomCount == "2+1" },
+                new() { Text = "3+1", Value = "3+1", Selected = roomCount == "3+1" },
+                new() { Text = "4+1", Value = "4+1", Selected = roomCount == "4+1" },
+                new() { Text = "4+2", Value = "4+2", Selected = roomCount == "4+2" },
+                new() { Text = "5+1", Value = "5+1", Selected = roomCount == "5+1" },
+                new() { Text = "Villa", Value = "Villa", Selected = roomCount == "Villa" }
+            };
 
             return View(values);
         }
@@ -173,7 +202,7 @@ namespace RealEstate.Web.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-      
+
         public async Task<IActionResult> AddToFavorites(int listingId, string? returnUrl)
         {
             if (!_authService.IsAuthenticated())
