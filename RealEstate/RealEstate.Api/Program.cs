@@ -7,12 +7,21 @@ using RealEstate.Api.Repositories;
 using RealEstate.Api.Services;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+// Allow cross-origin requests for web client (adjust origins in prod)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
 
 // EF Core - PostgreSQL yapılandırması
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -124,7 +133,21 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-app.UseStaticFiles(); // Bu satır olmazsa resimler 404 hatası verir (açılmaz).
+// Serve static files from wwwroot
+app.UseStaticFiles();
+// Explicitly serve uploaded files under /uploads
+var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
+if (Directory.Exists(uploadsPath))
+{
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(uploadsPath),
+        RequestPath = "/uploads"
+    });
+}
+
+// Enable CORS
+app.UseCors("AllowAll");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
