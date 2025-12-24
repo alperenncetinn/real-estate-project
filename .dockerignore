@@ -1,0 +1,24 @@
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+**/.idea/
+**/*.user
+**/*.suo
+**/*.swp
+**/*.tmp
+**/*.log
+
+# Git
+.git/
+.gitignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node, if any
+node_modules/
+
+# Publish output (built locally)
+**/publish/

@@ -1,0 +1,27 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: RealEstate/RealEstate.Api/Dockerfile
+    container_name: realestate-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=${DB_CONNECTION}
+      - JwtSettings__SecretKey=${JWT_SECRET}
+    ports:
+      - "5180:8080"
+    volumes:
+      - ./RealEstate/RealEstate.Api/uploads:/app/uploads
+
+  web:
+    build:
+      context: .
+      dockerfile: RealEstate/RealEstate.Web/Dockerfile
+    container_name: realestate-web
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ApiSettings__BaseUrl=${API_BASE_URL:-http://host.docker.internal:5180/}
+    ports:
+      - "5173:8080"
+    depends_on:
+      - api
