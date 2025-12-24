@@ -23,7 +23,8 @@ namespace RealEstate.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<string>("CreatedAt")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("ListingId")
@@ -39,7 +40,7 @@ namespace RealEstate.Api.Migrations
                     b.HasIndex("UserId", "ListingId")
                         .IsUnique();
 
-                    b.ToTable("Favorites");
+                    b.ToTable("Favorites", (string)null);
                 });
 
             modelBuilder.Entity("RealEstate.Api.Entities.Listing", b =>
@@ -53,10 +54,11 @@ namespace RealEstate.Api.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("CreatedDate")
+                    b.Property<string>("CreatedDate")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("DeactivatedAt")
+                    b.Property<string>("DeactivatedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("DeactivatedByUserId")
@@ -77,10 +79,10 @@ namespace RealEstate.Api.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("IsActive")
+                    b.Property<int>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(1);
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -109,7 +111,7 @@ namespace RealEstate.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Listings");
+                    b.ToTable("Listings", (string)null);
                 });
 
             modelBuilder.Entity("RealEstate.Api.Entities.Notification", b =>
@@ -118,10 +120,11 @@ namespace RealEstate.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<string>("CreatedAt")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("IsRead")
+                    b.Property<int>("IsRead")
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("ListingId")
@@ -153,7 +156,7 @@ namespace RealEstate.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notifications", (string)null);
                 });
 
             modelBuilder.Entity("RealEstate.Api.Entities.User", b =>
@@ -162,7 +165,8 @@ namespace RealEstate.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("CreatedDate")
+                    b.Property<string>("CreatedDate")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
@@ -175,7 +179,7 @@ namespace RealEstate.Api.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("IsActive")
+                    b.Property<int>("IsActive")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("LastName")
@@ -202,7 +206,7 @@ namespace RealEstate.Api.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("RealEstate.Api.Models.Property", b =>
@@ -242,7 +246,7 @@ namespace RealEstate.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Properties");
+                    b.ToTable("Properties", (string)null);
 
                     b.HasData(
                         new

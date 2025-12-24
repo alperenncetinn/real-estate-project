@@ -14,9 +14,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-// EF Core - SQLite yapılandırması
+// EF Core - PostgreSQL yapılandırması
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // JWT Service
 builder.Services.AddScoped<IJwtService, JwtService>();
