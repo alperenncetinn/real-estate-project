@@ -206,12 +206,19 @@
                     document.getElementById('step1Indicator').classList.add('completed');
                     document.getElementById('step2Indicator').classList.add('active');
                 } else {
-                    errorDiv.textContent = data.message || 'Bir hata oluştu';
+                    // Try to get error message from response
+                    let errorMessage = 'Bir hata oluştu';
+                    try {
+                        errorMessage = data.message || JSON.stringify(data);
+                    } catch(e) {
+                        errorMessage = `Hata kodu: ${response.status}`;
+                    }
+                    errorDiv.textContent = errorMessage;
                     errorDiv.style.display = 'block';
                 }
             } catch (error) {
                 console.error('Error:', error);
-                errorDiv.textContent = `Sunucuya bağlanılamadı (${apiBaseUrl}). Lütfen tekrar deneyin.`;
+                errorDiv.textContent = `Bağlantı hatası: ${error.message} (API: ${apiBaseUrl})`;
                 errorDiv.style.display = 'block';
             }
 
