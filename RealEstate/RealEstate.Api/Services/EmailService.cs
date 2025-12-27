@@ -88,10 +88,17 @@ namespace RealEstate.Api.Services
                 // Accept all certificates (for debugging) - Production'da kaldırılabilir ama 587 için güvenli
                 client.CheckCertificateRevocation = false;
 
-                // 20 sn timeout
-                client.Timeout = 20000;
+                // 30 sn timeout
+                client.Timeout = 30000;
 
-                await client.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.StartTls);
+                if (smtpPort == 465)
+                {
+                    await client.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.SslOnConnect);
+                }
+                else
+                {
+                    await client.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.StartTls);
+                }
                 
                 await client.AuthenticateAsync(senderEmail, senderPassword);
                 await client.SendAsync(message);
