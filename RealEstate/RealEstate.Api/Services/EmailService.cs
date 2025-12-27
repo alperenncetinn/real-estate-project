@@ -1,5 +1,6 @@
-using System.Net;
-using System.Net.Mail;
+using MimeKit;
+using MailKit.Net.Smtp;
+using MailKit.Security;
 
 namespace RealEstate.Api.Services
 {
@@ -23,36 +24,24 @@ namespace RealEstate.Api.Services
         {
             try
             {
-                // Config değerlerini logla (Şifrenin sadece ilk 3 karakterini göster)
                 var smtpHost = _configuration["Email:SmtpHost"] ?? "smtp.gmail.com";
-                var smtpPortStr = _configuration["Email:SmtpPort"] ?? "587";
+                var smtpPort = int.Parse(_configuration["Email:SmtpPort"] ?? "587");
                 var senderEmail = _configuration["Email:SenderEmail"] ?? "seninevinauth@gmail.com";
                 var senderPassword = _configuration["Email:SenderPassword"] ?? "uzfs pvzl uunk hoxl";
                 var senderName = _configuration["Email:SenderName"] ?? "Senin Evin";
 
-                // Debug log
-                Console.WriteLine($"[EmailService] Host: {smtpHost}, Port: {smtpPortStr}, Sender: {senderEmail}");
-                if (!string.IsNullOrEmpty(senderPassword) && senderPassword.Length > 3)
-                     Console.WriteLine($"[EmailService] Password Starts With: {senderPassword.Substring(0, 3)}...");
+                // Log without password
+                _logger.LogInformation("Attempting to connect to SMTP: Host={Host}, Port={Port}, User={User}", 
+                    smtpHost, smtpPort, senderEmail);
 
-                int smtpPort = int.Parse(smtpPortStr);
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress(senderName, senderEmail));
+                message.To.Add(new MailboxAddress("", toEmail));
+                message.Subject = "🏠 Senin Evin - E-posta Doğrulama Kodu";
 
-                // TLS 1.2 zorla
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-
-                using var client = new SmtpClient(smtpHost, smtpPort)
+                var bodyBuilder = new BodyBuilder
                 {
-                    Credentials = new NetworkCredential(senderEmail, senderPassword),
-                    EnableSsl = true,
-                    Timeout = 15000 // 15 saniye timeout
-                };
-
-                var mailMessage = new MailMessage
-                {
-                    From = new MailAddress(senderEmail, senderName),
-                    Subject = "🏠 Senin Evin - E-posta Doğrulama Kodu",
-                    IsBodyHtml = true,
-                    Body = $@"
+                    HtmlBody = $@"
                         <!DOCTYPE html>
                         <html>
                         <head>
@@ -93,22 +82,27 @@ namespace RealEstate.Api.Services
                     "
                 };
 
-                mailMessage.To.Add(toEmail);
+                message.Body = bodyBuilder.ToMessageBody();
 
-                Console.WriteLine($"[EmailService] Sending email to {toEmail}...");
-                await client.SendMailAsync(mailMessage);
-                Console.WriteLine($"[EmailService] Email sent successfully!");
+                using var client = new SmtpClient();
+                // Accept all certificates (for debugging) - Production'da kaldırılabilir ama 587 için güvenli
+                client.CheckCertificateRevocation = false;
+
+                // 20 sn timeout
+                client.Timeout = 20000;
+
+                await client.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.StartTls);
                 
-                _logger.LogInformation("Verification email sent to {Email}", toEmail);
+                await client.AuthenticateAsync(senderEmail, senderPassword);
+                await client.SendAsync(message);
+                await client.DisconnectAsync(true);
+                
+                _logger.LogInformation("Verification email sent successfully to {Email}", toEmail);
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[EmailService] ERROR: {ex.Message}");
-                if (ex.InnerException != null)
-                     Console.WriteLine($"[EmailService] INNER ERROR: {ex.InnerException.Message}");
-
-                _logger.LogError(ex, "Failed to send verification email to {Email}", toEmail);
+                _logger.LogError(ex, "Failed to send verification email. Error: {Error}", ex.Message);
                 return false;
             }
         }
