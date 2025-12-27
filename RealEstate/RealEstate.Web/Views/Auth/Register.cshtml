@@ -168,7 +168,7 @@
     <partial name="_ValidationScriptsPartial" />
     <script>
         let verifiedEmail = '';
-        const apiBaseUrl = '@Configuration["ApiSettings:BaseUrl"]';
+        const apiBaseUrl = '@Configuration["ApiSettings:BaseUrl"]'.replace(/\/+$/, ''); // Remove trailing slashes
 
         async function sendVerificationCode() {
             const email = document.getElementById('emailInput').value.trim();
