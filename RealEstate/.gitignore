@@ -1,0 +1,50 @@
+# Dependencies
+bin/
+obj/
+.vs/
+.vscode/
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+build/
+bld/
+
+# NuGet Packages
+packages/
+*.nupkg
+
+# Local database
+*.db
+*.db-journal
+
+# Logs
+logs/
+*.log
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+# Secrets - ASLA COMMIT ETMEYİN!
+appsettings.Development.json
+appsettings.Local.json
+
+# Upload files
+uploads/
+
+# Test results
+TestResults/

@@ -27,9 +27,23 @@
             {
                 <div class="col">
                     <div class="card h-100">
-                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                        @{
+                            var firstImage = item.Images?.FirstOrDefault();
+                            var hasBase64Image = firstImage != null && !string.IsNullOrEmpty(firstImage.Base64Data);
+                        }
+                        @if (hasBase64Image)
+                        {
+                            <img src="data:image/png;base64,@firstImage!.Base64Data" class="card-img-top" style="height:200px;object-fit:cover;" />
+                        }
+                        else if (!string.IsNullOrEmpty(item.ImageUrl))
                         {
                             <img src="http://localhost:5180@(item.ImageUrl)" class="card-img-top" style="height:200px;object-fit:cover;" />
+                        }
+                        else
+                        {
+                            <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height:200px;">
+                                <span>Resim Yok</span>
+                            </div>
                         }
 
                         <div class="card-body">

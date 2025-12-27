@@ -103,7 +103,7 @@ namespace RealEstate.Web.Services
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
+                Secure = false, // Development için false, Production'da true olmalı
                 SameSite = SameSiteMode.Lax,
                 Expires = rememberMe ? DateTimeOffset.UtcNow.AddDays(7) : null
             };

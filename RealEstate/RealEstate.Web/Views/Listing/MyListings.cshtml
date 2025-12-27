@@ -52,7 +52,16 @@
                     {
                         <tr class="@(item.IsActive ? "" : "table-secondary")">
                             <td style="width: 80px;">
-                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                @{
+                                    var firstImage = item.Images?.FirstOrDefault();
+                                    var hasBase64Image = firstImage != null && !string.IsNullOrEmpty(firstImage.Base64Data);
+                                }
+                                @if (hasBase64Image)
+                                {
+                                    <img src="data:image/png;base64,@firstImage!.Base64Data" alt="@item.Title"
+                                        style="width: 60px; height: 45px; object-fit: cover; border-radius: 4px;">
+                                }
+                                else if (!string.IsNullOrEmpty(item.ImageUrl))
                                 {
                                     <img src="http://localhost:5180@(item.ImageUrl)" alt="@item.Title"
                                         style="width: 60px; height: 45px; object-fit: cover; border-radius: 4px;">

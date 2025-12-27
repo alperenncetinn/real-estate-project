@@ -31,6 +31,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IListingRepository, ListingRepository>();
 builder.Services.AddScoped<IListingService, ListingService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // JWT Authentication yapılandırması
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -61,14 +62,15 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// CORS yapılandırması - RealEstate.Web'in API'ye erişmesine izin ver
+// CORS yapılandırması - Railway ve localhost için
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowWeb", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "https://localhost:7173")
+        policy.SetIsOriginAllowed(origin => true) // Production'da belirli origin'leri ekleyin
               .AllowAnyMethod()
-              .AllowAnyHeader();
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 

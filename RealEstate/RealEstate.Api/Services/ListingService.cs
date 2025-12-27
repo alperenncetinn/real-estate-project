@@ -273,7 +273,13 @@ namespace RealEstate.Api.Services
                 OwnerName = listing.Owner != null ? listing.Owner.FirstName + " " + listing.Owner.LastName : null,
                 OwnerPhone = listing.Owner?.PhoneNumber,
                 DeactivationReason = listing.DeactivationReason,
-                DeactivatedAt = listing.DeactivatedAt
+                DeactivatedAt = listing.DeactivatedAt,
+                Images = listing.Images?.Select(i => new ListingImageDto
+                {
+                    Id = i.Id,
+                    Base64Data = i.Base64Data,
+                    FileName = i.FileName
+                }).ToList()
             };
         }
     }

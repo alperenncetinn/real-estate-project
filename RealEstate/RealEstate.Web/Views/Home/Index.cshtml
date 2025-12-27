@@ -2,225 +2,196 @@
     ViewData["Title"] = "Ana Sayfa";
 }
 
-<div class="container mt-4">
-
-    <!-- BAŞLIK -->
-    <div class="row mb-4">
-        <div class="col-md-10">
-            <h1 class="fw-bold hero-title">Hayalinizdeki Evi Bulun</h1>
-            <p class="text-muted hero-subtitle">
-                Kiralık ve satılık ilanlara kategorilerden ulaşabilirsiniz.
-            </p>
+<!-- HERO SECTION -->
+<section class="hero-section text-center mb-5 mx-2 mx-md-4 mx-lg-5" style="border-radius: 2rem;">
+    <div class="container position-relative" style="z-index: 2;">
+        <div class="d-inline-block px-3 py-2 rounded-pill mb-3" style="background: rgba(255,255,255,0.2);">
+            <span class="me-2">🏡</span>
+            <span class="small fw-semibold">Hayalindeki ev seni bekliyor!</span>
+        </div>
+        <h1 class="display-4 fw-bold mb-3" style="letter-spacing: -0.02em;">
+            Yeni Yuvanı<br>
+            <span style="text-shadow: 2px 2px 20px rgba(0,0,0,0.2);">Birlikte Bulalım</span> 💕
+        </h1>
+        <p class="lead opacity-90 mb-4 mx-auto" style="max-width: 550px;">
+            Sıcacık bir ev arıyorsan doğru yerdesin! Binlerce ilan arasından sana özel olanı keşfet.
+        </p>
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
+            <a href="/Listing" class="btn btn-light btn-lg px-4 fw-bold">
+                <i class="bi bi-search me-2"></i>İlanları Gör
+            </a>
+            <a href="/Listing/Create" class="btn btn-outline-light btn-lg px-4 fw-bold">
+                <i class="bi bi-plus-lg me-2"></i>Ücretsiz İlan Ver
+            </a>
         </div>
     </div>
+</section>
 
-    <!-- ========================= -->
-    <!-- KATEGORİLER (KİRALIK / SATILIK) -->
-    <!-- ========================= -->
-    <div class="row g-4 mb-5">
+<!-- FUN STATS -->
+<div class="row g-4 mb-5">
+    <div class="col-6 col-md-3">
+        <div class="card text-center p-4 h-100 border-0 hover-lift" style="border-radius: 1.5rem;">
+            <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                 style="width: 70px; height: 70px; background: linear-gradient(135deg, #fce7f3, #fbcfe8);">
+                <span style="font-size: 2rem;">🏠</span>
+            </div>
+            <h3 class="fw-bold mb-1" style="color: #ec4899;">500+</h3>
+            <small class="text-muted">Satılık Ev</small>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center p-4 h-100 border-0 hover-lift" style="border-radius: 1.5rem;">
+            <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                 style="width: 70px; height: 70px; background: linear-gradient(135deg, #ccfbf1, #99f6e4);">
+                <span style="font-size: 2rem;">🔑</span>
+            </div>
+            <h3 class="fw-bold mb-1" style="color: #14b8a6;">350+</h3>
+            <small class="text-muted">Kiralık Ev</small>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center p-4 h-100 border-0 hover-lift" style="border-radius: 1.5rem;">
+            <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                 style="width: 70px; height: 70px; background: linear-gradient(135deg, #e9d5ff, #d8b4fe);">
+                <span style="font-size: 2rem;">💜</span>
+            </div>
+            <h3 class="fw-bold mb-1" style="color: #a855f7;">2K+</h3>
+            <small class="text-muted">Üye</small>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center p-4 h-100 border-0 hover-lift" style="border-radius: 1.5rem;">
+            <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                 style="width: 70px; height: 70px; background: linear-gradient(135deg, #fed7aa, #fdba74);">
+                <span style="font-size: 2rem;">🌆</span>
+            </div>
+            <h3 class="fw-bold mb-1" style="color: #f97316;">81</h3>
+            <small class="text-muted">Şehir</small>
+        </div>
+    </div>
+</div>
 
+<!-- KATEGORİLER -->
+<div class="mb-5">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold mb-2">Ne Arıyorsun? 🤔</h2>
+        <p class="text-muted">Hayalindeki eve bir tık uzaktasın</p>
+    </div>
+
+    <div class="row g-4">
         <!-- KİRALIK -->
         <div class="col-12 col-lg-6">
-            <div class="category-card category-rent">
-                <div class="category-body">
-                    <div class="d-flex align-items-start gap-3">
-                        <div class="category-icon rent-icon">🔑</div>
-
-                        <div class="flex-grow-1">
-                            <div class="category-badge rent-badge">KİRALIK</div>
-                            <h4 class="mb-1 category-title rent-title">Kiralık Evler</h4>
-                            <p class="category-desc mb-0">
-                                Şehir ve bütçenize göre kiralık ev ilanlarını kolayca inceleyin.
-                            </p>
-                        </div>
+            <div class="card border-0 h-100 overflow-hidden category-hover" 
+                 style="background: linear-gradient(135deg, #14b8a6 0%, #2dd4bf 100%); border-radius: 1.5rem;">
+                <div class="card-body p-4 text-white position-relative" style="min-height: 220px;">
+                    <div class="position-absolute" style="top: -20px; right: -20px; opacity: 0.15;">
+                        <i class="bi bi-key-fill" style="font-size: 180px;"></i>
                     </div>
-
-                    <a class="category-btn rent-btn mt-3" href="/Listing?type=Kiralık">
-                        Kiralık İlanlara Git →
-                    </a>
+                    <div class="position-relative" style="z-index: 2;">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="rounded-3 p-3" style="background: rgba(255,255,255,0.25);">
+                                <span style="font-size: 2rem;">🔑</span>
+                            </div>
+                            <div>
+                                <span class="badge bg-white text-dark mb-1 fw-bold">KİRALIK</span>
+                                <h4 class="mb-0 fw-bold">Kiralık Evler</h4>
+                            </div>
+                        </div>
+                        <p class="opacity-90 mb-4">
+                            Bütçene uygun, rahat ve sıcacık bir yuva seni bekliyor!
+                        </p>
+                        <a href="/Listing?type=Kiralık" class="btn btn-light fw-bold px-4 rounded-pill">
+                            Hemen Bak <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- SATILIK -->
         <div class="col-12 col-lg-6">
-            <div class="category-card category-sale">
-                <div class="category-body">
-                    <div class="d-flex align-items-start gap-3">
-                        <div class="category-icon sale-icon">🏠</div>
-
-                        <div class="flex-grow-1">
-                            <div class="category-badge sale-badge">SATILIK</div>
-                            <h4 class="mb-1 category-title sale-title">Satılık Evler</h4>
-                            <p class="category-desc mb-0">
-                                Satılık ev ilanlarını görüntüleyin ve hayalinizdeki evi bulun.
-                            </p>
-                        </div>
+            <div class="card border-0 h-100 overflow-hidden category-hover" 
+                 style="background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%); border-radius: 1.5rem;">
+                <div class="card-body p-4 text-white position-relative" style="min-height: 220px;">
+                    <div class="position-absolute" style="top: -20px; right: -20px; opacity: 0.15;">
+                        <i class="bi bi-house-heart-fill" style="font-size: 180px;"></i>
                     </div>
-
-                    <a class="category-btn sale-btn mt-3" href="/Listing?type=Satılık">
-                        Satılık İlanlara Git →
-                    </a>
+                    <div class="position-relative" style="z-index: 2;">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="rounded-3 p-3" style="background: rgba(255,255,255,0.25);">
+                                <span style="font-size: 2rem;">🏡</span>
+                            </div>
+                            <div>
+                                <span class="badge bg-white text-dark mb-1 fw-bold">SATILIK</span>
+                                <h4 class="mb-0 fw-bold">Satılık Evler</h4>
+                            </div>
+                        </div>
+                        <p class="opacity-90 mb-4">
+                            Kendi evinin sahibi ol, hayallerini gerçekleştir!
+                        </p>
+                        <a href="/Listing?type=Satılık" class="btn btn-light fw-bold px-4 rounded-pill">
+                            Keşfet <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 
+<!-- NEDEN BİZ -->
+<div class="card border-0 p-4 p-md-5 mb-5" style="background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #f5f5f4 100%); border-radius: 2rem;">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold mb-2">Neden Senin Evin? 💕</h2>
+        <p class="text-muted">Binlerce kişi bize güveniyor</p>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="text-center">
+                <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                     style="width: 90px; height: 90px; background: linear-gradient(135deg, #f472b6, #ec4899); box-shadow: 0 15px 35px -10px rgba(236,72,153,0.4);">
+                    <span style="font-size: 2.5rem;">🛡️</span>
+                </div>
+                <h5 class="fw-bold">Güvenli</h5>
+                <p class="text-muted small">Tüm ilanlar tek tek kontrol ediliyor, güvenle gezin.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="text-center">
+                <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                     style="width: 90px; height: 90px; background: linear-gradient(135deg, #2dd4bf, #14b8a6); box-shadow: 0 15px 35px -10px rgba(20,184,166,0.4);">
+                    <span style="font-size: 2.5rem;">⚡</span>
+                </div>
+                <h5 class="fw-bold">Hızlı</h5>
+                <p class="text-muted small">Dakikalar içinde ilan ver, anında yayınlansın.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="text-center">
+                <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                     style="width: 90px; height: 90px; background: linear-gradient(135deg, #c084fc, #a855f7); box-shadow: 0 15px 35px -10px rgba(168,85,247,0.4);">
+                    <span style="font-size: 2.5rem;">💬</span>
+                </div>
+                <h5 class="fw-bold">Kolay İletişim</h5>
+                <p class="text-muted small">İlan sahipleriyle doğrudan konuş, aracı yok!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA -->
+<div class="text-center p-5 rounded-4 mb-4" style="background: linear-gradient(135deg, #a855f7 0%, #c084fc 50%, #d8b4fe 100%);">
+    <h3 class="text-white fw-bold mb-3">Hadi Başlayalım! 🚀</h3>
+    <p class="text-white opacity-90 mb-4">Senin için en uygun evi bulmak için sabırsızlanıyoruz</p>
+    <a href="/Listing" class="btn btn-light btn-lg px-5 fw-bold rounded-pill">
+        <i class="bi bi-arrow-right-circle me-2"></i>İlanlara Göz At
+    </a>
+</div>
+
 <style>
-    :root {
-        --font-head: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-        --font-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
-        --rent: #0d6efd;
-        --sale: #198754;
-        --text: #111827;
-        --muted: #6b7280;
-        --border: rgba(17, 24, 39, .10);
-        --shadow: 0 10px 28px rgba(0, 0, 0, .06);
-        --shadowHover: 0 16px 40px rgba(0, 0, 0, .10);
-    }
-
-    .hero-title {
-        font-family: var(--font-head);
-        font-weight: 900;
-        letter-spacing: -0.4px;
-        color: var(--text);
-        line-height: 1.05;
-        margin-bottom: 8px;
-    }
-
-    .hero-subtitle {
-        font-family: var(--font-body);
-        color: var(--muted);
-        font-size: 1rem;
-        margin-bottom: 0;
-    }
-
-    .category-card {
-        border-radius: 18px;
-        border: 1px solid var(--border);
-        box-shadow: var(--shadow);
-        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-        overflow: hidden;
-        background: #fff;
-    }
-
-    .category-card:hover {
-        transform: translateY(-3px);
-        box-shadow: var(--shadowHover);
-        border-color: rgba(17, 24, 39, .16);
-    }
-
-    .category-rent {
-        background: linear-gradient(180deg, rgba(13, 110, 253, .06), rgba(255, 255, 255, 1) 55%);
-    }
-
-    .category-sale {
-        background: linear-gradient(180deg, rgba(25, 135, 84, .06), rgba(255, 255, 255, 1) 55%);
-    }
-
-    .category-body {
-        padding: 18px 18px 16px;
-        font-family: var(--font-body);
-    }
-
-    .category-icon {
-        width: 56px;
-        height: 56px;
-        border-radius: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 28px;
-        color: #fff;
-        flex-shrink: 0;
-        box-shadow: 0 10px 18px rgba(0, 0, 0, .10);
-    }
-
-    .rent-icon {
-        background: linear-gradient(135deg, #0d6efd, #6aa8ff);
-    }
-
-    .sale-icon {
-        background: linear-gradient(135deg, #198754, #6fe2a0);
-    }
-
-    .category-badge {
-        display: inline-block;
-        font-size: .72rem;
-        font-weight: 800;
-        letter-spacing: .6px;
-        padding: 6px 10px;
-        border-radius: 999px;
-        margin-bottom: 6px;
-    }
-
-    .rent-badge {
-        background: rgba(13, 110, 253, .12);
-        color: var(--rent);
-    }
-
-    .sale-badge {
-        background: rgba(25, 135, 84, .12);
-        color: var(--sale);
-    }
-
-    .category-title {
-        font-family: var(--font-head);
-        font-weight: 900;
-        letter-spacing: -0.25px;
-        margin: 0;
-    }
-
-    .rent-title {
-        color: #0b5ed7;
-    }
-
-    .sale-title {
-        color: #146c43;
-    }
-
-    .category-desc {
-        color: #4b5563;
-        font-size: .98rem;
-        line-height: 1.45;
-        margin-top: 6px;
-    }
-
-    .category-btn {
-        width: 100%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        border-radius: 12px;
-        padding: 12px 14px;
-        font-weight: 800;
-        border: 0;
-        transition: transform .15s ease, filter .15s ease, box-shadow .15s ease;
-        box-shadow: 0 10px 18px rgba(0, 0, 0, .08);
-    }
-
-    .category-btn:hover {
-        transform: translateY(-1px);
-        filter: brightness(.98);
-        box-shadow: 0 14px 26px rgba(0, 0, 0, .12);
-    }
-
-    .rent-btn {
-        background: var(--rent);
-        color: #fff;
-    }
-
-    .sale-btn {
-        background: var(--sale);
-        color: #fff;
-    }
-
-    @@media (max-width: 576px) {
-        .hero-title {
-            font-size: 1.65rem;
-        }
+    @@keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
     }
 </style>
