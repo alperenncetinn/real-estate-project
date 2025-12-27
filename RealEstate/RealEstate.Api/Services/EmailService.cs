@@ -27,7 +27,7 @@ namespace RealEstate.Api.Services
             try
             {
                 var apiKey = _configuration["Email:ApiKey"];
-                var senderEmail = _configuration["Email:SenderEmail"] ?? "onboarding@resend.dev";
+                var senderEmail = _configuration["Email:SenderEmail"] ?? "auth@real-estate-project.store";
                 var senderName = _configuration["Email:SenderName"] ?? "Senin Evin";
 
                 // Eğer senderEmail onboarding@resend.dev ise ve alıcı biz değilsek, Resend hata verebilir (test modunda).
