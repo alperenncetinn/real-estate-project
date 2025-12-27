@@ -186,6 +186,9 @@
             errorDiv.style.display = 'none';
 
             try {
+                console.log('API URL:', apiBaseUrl);
+                console.log('Sending request to:', `${apiBaseUrl}/api/auth/send-verification-code`);
+                
                 const response = await fetch(`${apiBaseUrl}/api/auth/send-verification-code`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -207,7 +210,8 @@
                     errorDiv.style.display = 'block';
                 }
             } catch (error) {
-                errorDiv.textContent = 'Sunucuya bağlanılamadı. Lütfen tekrar deneyin.';
+                console.error('Error:', error);
+                errorDiv.textContent = `Sunucuya bağlanılamadı (${apiBaseUrl}). Lütfen tekrar deneyin.`;
                 errorDiv.style.display = 'block';
             }
 
