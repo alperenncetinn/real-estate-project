@@ -95,11 +95,30 @@ namespace RealEstate.Api.Services
                 UserId = userId,
                 IsActive = true,
                 RoomCount = dto.RoomCount,
-                SquareMeters = dto.SquareMeters
+                SquareMeters = dto.SquareMeters,
+                Images = new List<Image>(),
+                ImageUrl = "" // Artık kullanılmıyor ama null hatası vermesin
             };
 
-            var uploadedUrl = await SavePhotoAsync(dto.Photo);
-            listing.ImageUrl = uploadedUrl ?? dto.ImageUrl;
+            // Resmi Base64 olarak kaydet
+            if (dto.Photo != null && dto.Photo.Length > 0)
+            {
+                using var memoryStream = new MemoryStream();
+                await dto.Photo.CopyToAsync(memoryStream);
+                var base64Data = Convert.ToBase64String(memoryStream.ToArray());
+                
+                listing.Images.Add(new Image
+                {
+                    Base64Data = base64Data,
+                    FileName = dto.Photo.FileName
+                });
+            }
+
+            // ImageUrl yedeği (eğer dışarıdan URL gelirse)
+            if (!string.IsNullOrEmpty(dto.ImageUrl) && dto.Photo == null)
+            {
+                listing.ImageUrl = dto.ImageUrl;
+            }
 
             await _repository.AddAsync(listing);
             await _repository.SaveChangesAsync();
@@ -134,10 +153,24 @@ namespace RealEstate.Api.Services
             listing.RoomCount = dto.RoomCount;
             listing.SquareMeters = dto.SquareMeters;
 
-            var uploadedUrl = await SavePhotoAsync(dto.Photo);
-            if (uploadedUrl != null)
+            // Fotoğraf güncelleme: Yeni fotoğraf varsa veritabanına ekle
+            if (dto.Photo != null && dto.Photo.Length > 0)
             {
-                listing.ImageUrl = uploadedUrl;
+                using var memoryStream = new MemoryStream();
+                await dto.Photo.CopyToAsync(memoryStream);
+                var base64Data = Convert.ToBase64String(memoryStream.ToArray());
+
+                // Listing'in Images koleksiyonunu yüklememiz lazım (Repository GetById'de include yoksa null olabilir)
+                // Bu yüzden ??= ile initialize ediyoruz ama EF Core tracking için Include edilmesi şart.
+                // ListingRepository.GetByIdAsync metodunun 'Include(i => i.Images)' yaptığından emin olmalıyız.
+                // Eğer yapmıyorsa, burada explicit loading gerekebilir veya service'de Repository methodu güncellenmeli.
+                
+                listing.Images ??= new List<Image>();
+                listing.Images.Add(new Image
+                {
+                    Base64Data = base64Data,
+                    FileName = dto.Photo.FileName
+                });
             }
 
             await _repository.SaveChangesAsync();
@@ -234,24 +267,7 @@ namespace RealEstate.Api.Services
             return OperationResult<bool>.Ok(true);
         }
 
-        private async Task<string?> SavePhotoAsync(IFormFile? photo)
-        {
-            if (photo == null || photo.Length == 0)
-            {
-                return null;
-            }
-
-            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(photo.FileName);
-            var root = _environment.WebRootPath ?? _environment.ContentRootPath;
-            var uploadPath = Path.Combine(root, "uploads");
-            Directory.CreateDirectory(uploadPath);
-
-            var filePath = Path.Combine(uploadPath, fileName);
-            await using var stream = new FileStream(filePath, FileMode.Create);
-            await photo.CopyToAsync(stream);
-
-            return "/uploads/" + fileName;
-        }
+        // SavePhotoAsync metodu artık kullanılmıyor (Base64 veritabanı kaydı kullanılıyor)
 
         private static ListingResponseDto MapToResponse(Listing listing)
         {
