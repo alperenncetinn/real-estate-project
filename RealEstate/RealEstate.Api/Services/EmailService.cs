@@ -1,5 +1,6 @@
-using System.Net;
-using System.Net.Mail;
+using MimeKit;
+using MailKit.Net.Smtp;
+using MailKit.Security;
 
 namespace RealEstate.Api.Services
 {
@@ -26,21 +27,21 @@ namespace RealEstate.Api.Services
                 var smtpHost = _configuration["Email:SmtpHost"] ?? "smtp.gmail.com";
                 var smtpPort = int.Parse(_configuration["Email:SmtpPort"] ?? "587");
                 var senderEmail = _configuration["Email:SenderEmail"] ?? "seninevinauth@gmail.com";
-                var senderPassword = _configuration["Email:SenderPassword"] ?? "Alperen100617";
+                var senderPassword = _configuration["Email:SenderPassword"] ?? "uzfs pvzl uunk hoxl";
                 var senderName = _configuration["Email:SenderName"] ?? "Senin Evin";
 
-                using var client = new SmtpClient(smtpHost, smtpPort)
-                {
-                    Credentials = new NetworkCredential(senderEmail, senderPassword),
-                    EnableSsl = true
-                };
+                // Log without password
+                _logger.LogInformation("Attempting to connect to SMTP: Host={Host}, Port={Port}, User={User}", 
+                    smtpHost, smtpPort, senderEmail);
 
-                var mailMessage = new MailMessage
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress(senderName, senderEmail));
+                message.To.Add(new MailboxAddress("", toEmail));
+                message.Subject = "🏠 Senin Evin - E-posta Doğrulama Kodu";
+
+                var bodyBuilder = new BodyBuilder
                 {
-                    From = new MailAddress(senderEmail, senderName),
-                    Subject = "🏠 Senin Evin - E-posta Doğrulama Kodu",
-                    IsBodyHtml = true,
-                    Body = $@"
+                    HtmlBody = $@"
                         <!DOCTYPE html>
                         <html>
                         <head>
@@ -81,15 +82,27 @@ namespace RealEstate.Api.Services
                     "
                 };
 
-                mailMessage.To.Add(toEmail);
+                message.Body = bodyBuilder.ToMessageBody();
 
-                await client.SendMailAsync(mailMessage);
-                _logger.LogInformation("Verification email sent to {Email}", toEmail);
+                using var client = new SmtpClient();
+                // Accept all certificates (for debugging) - Production'da kaldırılabilir ama 587 için güvenli
+                client.CheckCertificateRevocation = false;
+
+                // 20 sn timeout
+                client.Timeout = 20000;
+
+                await client.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.StartTls);
+                
+                await client.AuthenticateAsync(senderEmail, senderPassword);
+                await client.SendAsync(message);
+                await client.DisconnectAsync(true);
+                
+                _logger.LogInformation("Verification email sent successfully to {Email}", toEmail);
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to send verification email to {Email}", toEmail);
+                _logger.LogError(ex, "Failed to send verification email. Error: {Error}", ex.Message);
                 return false;
             }
         }
