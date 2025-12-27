@@ -31,7 +31,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IListingRepository, ListingRepository>();
 builder.Services.AddScoped<IListingService, ListingService>();
-builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddHttpClient<IEmailService, EmailService>();
+// builder.Services.AddScoped<IEmailService, EmailService>(); // HttpClient ile kayıt için üstteki satırı kullanıyoruz
 
 // JWT Authentication yapılandırması
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");

@@ -1,6 +1,6 @@
-using MimeKit;
-using MailKit.Net.Smtp;
-using MailKit.Security;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 
 namespace RealEstate.Api.Services
 {
@@ -11,11 +11,13 @@ namespace RealEstate.Api.Services
 
     public class EmailService : IEmailService
     {
+        private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly ILogger<EmailService> _logger;
 
-        public EmailService(IConfiguration configuration, ILogger<EmailService> logger)
+        public EmailService(HttpClient httpClient, IConfiguration configuration, ILogger<EmailService> logger)
         {
+            _httpClient = httpClient;
             _configuration = configuration;
             _logger = logger;
         }
@@ -24,24 +26,20 @@ namespace RealEstate.Api.Services
         {
             try
             {
-                var smtpHost = _configuration["Email:SmtpHost"] ?? "smtp.gmail.com";
-                var smtpPort = int.Parse(_configuration["Email:SmtpPort"] ?? "587");
-                var senderEmail = _configuration["Email:SenderEmail"] ?? "seninevinauth@gmail.com";
-                var senderPassword = _configuration["Email:SenderPassword"] ?? "uzfs pvzl uunk hoxl";
+                var apiKey = _configuration["Email:ApiKey"];
+                var senderEmail = _configuration["Email:SenderEmail"] ?? "onboarding@resend.dev";
                 var senderName = _configuration["Email:SenderName"] ?? "Senin Evin";
 
-                // Log without password
-                _logger.LogInformation("Attempting to connect to SMTP: Host={Host}, Port={Port}, User={User}", 
-                    smtpHost, smtpPort, senderEmail);
+                // Eğer senderEmail onboarding@resend.dev ise ve alıcı biz değilsek, Resend hata verebilir (test modunda).
+                // Ancak kullanıcı kendi mailine test edeceği için sorun olmamalı.
+                _logger.LogInformation("Sending email via Resend API to {Email} from {Sender}", toEmail, senderEmail);
 
-                var message = new MimeMessage();
-                message.From.Add(new MailboxAddress(senderName, senderEmail));
-                message.To.Add(new MailboxAddress("", toEmail));
-                message.Subject = "🏠 Senin Evin - E-posta Doğrulama Kodu";
-
-                var bodyBuilder = new BodyBuilder
+                var emailData = new
                 {
-                    HtmlBody = $@"
+                    from = $"{senderName} <{senderEmail}>",
+                    to = new[] { toEmail },
+                    subject = "🏠 Senin Evin - E-posta Doğrulama Kodu",
+                    html = $@"
                         <!DOCTYPE html>
                         <html>
                         <head>
@@ -82,34 +80,27 @@ namespace RealEstate.Api.Services
                     "
                 };
 
-                message.Body = bodyBuilder.ToMessageBody();
+                var request = new HttpRequestMessage(HttpMethod.Post, "https://api.resend.com/emails");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+                request.Content = new StringContent(JsonSerializer.Serialize(emailData), Encoding.UTF8, "application/json");
 
-                using var client = new SmtpClient();
-                // Accept all certificates (for debugging) - Production'da kaldırılabilir ama 587 için güvenli
-                client.CheckCertificateRevocation = false;
+                var response = await _httpClient.SendAsync(request);
+                var responseContent = await response.Content.ReadAsStringAsync();
 
-                // 30 sn timeout
-                client.Timeout = 30000;
-
-                if (smtpPort == 465)
+                if (response.IsSuccessStatusCode)
                 {
-                    await client.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.SslOnConnect);
+                    _logger.LogInformation("Email sent successfully. Response: {Response}", responseContent);
+                    return true;
                 }
                 else
                 {
-                    await client.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.StartTls);
+                    _logger.LogError("Failed to send email. Status: {Status}, Response: {Response}", response.StatusCode, responseContent);
+                    return false;
                 }
-                
-                await client.AuthenticateAsync(senderEmail, senderPassword);
-                await client.SendAsync(message);
-                await client.DisconnectAsync(true);
-                
-                _logger.LogInformation("Verification email sent successfully to {Email}", toEmail);
-                return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to send verification email. Error: {Error}", ex.Message);
+                _logger.LogError(ex, "Exception while sending email via Resend API");
                 return false;
             }
         }
