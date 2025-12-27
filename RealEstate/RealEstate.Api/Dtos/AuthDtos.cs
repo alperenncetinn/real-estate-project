@@ -43,4 +43,15 @@ namespace RealEstate.Api.Dtos
     {
         public required string Role { get; set; }
     }
+
+    public class SendVerificationCodeDto
+    {
+        public string? Email { get; set; }
+    }
+
+    public class VerifyEmailDto
+    {
+        public string? Email { get; set; }
+        public string? Code { get; set; }
+    }
 }

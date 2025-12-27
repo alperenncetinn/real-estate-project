@@ -1,0 +1,24 @@
+# RealEstate Web Dockerfile
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+EXPOSE 8080
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+COPY ["RealEstate.Web/RealEstate.Web.csproj", "RealEstate.Web/"]
+RUN dotnet restore "RealEstate.Web/RealEstate.Web.csproj"
+COPY . .
+WORKDIR "/src/RealEstate.Web"
+RUN dotnet build "RealEstate.Web.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "RealEstate.Web.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+
+ENV ASPNETCORE_URLS=http://+:8080
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+ENTRYPOINT ["dotnet", "RealEstate.Web.dll"]

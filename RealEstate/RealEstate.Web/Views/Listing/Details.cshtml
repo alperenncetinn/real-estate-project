@@ -13,7 +13,16 @@
 
     <div class="row">
         <div class="col-md-7 mb-4">
-            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            @{
+                var firstImage = Model.Images?.FirstOrDefault();
+                var hasBase64Image = firstImage != null && !string.IsNullOrEmpty(firstImage.Base64Data);
+            }
+            @if (hasBase64Image)
+            {
+                <img src="data:image/png;base64,@firstImage!.Base64Data"
+                    alt="@Model.Title" class="img-fluid rounded shadow w-100" style="max-height: 500px; object-fit: cover;">
+            }
+            else if (!string.IsNullOrEmpty(Model.ImageUrl))
             {
                 @* ImageUrl başında / varsa localhost:5180 ile birleştir, yoksa direkt kullan *@
                 <img src="@(Model.ImageUrl.StartsWith("/") ? "http://localhost:5180" + Model.ImageUrl : Model.ImageUrl)"
@@ -25,6 +34,19 @@
                 <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded shadow"
                     style="height: 400px;">
                     <span class="fs-4">Resim Yok</span>
+                </div>
+            }
+
+            @* Eğer birden fazla görsel varsa küçük galeri göster *@
+            @if (Model.Images != null && Model.Images.Count > 1)
+            {
+                <div class="d-flex flex-wrap gap-2 mt-3">
+                    @foreach (var img in Model.Images)
+                    {
+                        <img src="data:image/png;base64,@img.Base64Data" 
+                            class="rounded border" style="width: 80px; height: 60px; object-fit: cover; cursor: pointer;"
+                            onclick="document.querySelector('.col-md-7 > img').src = this.src">
+                    }
                 </div>
             }
         </div>

@@ -38,6 +38,7 @@ namespace RealEstate.Web.Models
         public string Email { get; set; } = string.Empty;
 
         [Phone(ErrorMessage = "Geçerli bir telefon numarası giriniz.")]
+        [RegularExpression(@"^(05\d{9}|5\d{9})$", ErrorMessage = "Telefon numarası 05XX XXX XX XX formatında olmalıdır (10-11 hane).")]
         [Display(Name = "Telefon Numarası")]
         public string? PhoneNumber { get; set; }
 
@@ -80,6 +81,7 @@ namespace RealEstate.Web.Models
         public string Email { get; set; } = string.Empty;
 
         [Phone(ErrorMessage = "Geçerli bir telefon numarası giriniz.")]
+        [RegularExpression(@"^(05\d{9}|5\d{9})$", ErrorMessage = "Telefon numarası 05XX XXX XX XX formatında olmalıdır (10-11 hane).")]
         [Display(Name = "Telefon Numarası")]
         public string? PhoneNumber { get; set; }
     }

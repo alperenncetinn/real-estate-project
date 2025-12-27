@@ -1,13 +1,15 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - RealEstate.Web</title>
+    <meta name="description" content="Senin Evin - Hayalindeki evi bul. Türkiye'nin en sevimli emlak platformu.">
+    <meta name="theme-color" content="#ec4899">
+    <title>@ViewData["Title"] - Senin Evin 🏠</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -16,31 +18,41 @@
 
 <body class="app-body">
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-white app-navbar mb-4">
+        <nav class="navbar navbar-expand-lg app-navbar">
             <div class="container-xxl">
-                <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">RealEstate.Web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span class="d-inline-flex align-items-center justify-content-center rounded-circle" 
+                          style="width: 42px; height: 42px; background: linear-gradient(135deg, #f472b6, #ec4899);">
+                        <i class="bi bi-house-heart-fill text-white"></i>
+                    </span>
+                    <span>Senin Evin</span>
+                </a>
+                <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
                         aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+                    <i class="bi bi-list fs-4" style="color: #ec4899;"></i>
                 </button>
 
                 <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between" id="mainNav">
-                    <ul class="navbar-nav flex-grow-1">
+                    <ul class="navbar-nav flex-grow-1 gap-1 ms-lg-4">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Ana Sayfa</a>
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-house-heart me-1"></i>Ana Sayfa
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Listing" asp-action="Create">Ilan Ekle</a>
+                            <a class="nav-link" asp-area="" asp-controller="Listing" asp-action="Index">
+                                <i class="bi bi-buildings me-1"></i>İlanlar
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Gizlilik</a>
+                            <a class="nav-link" asp-area="" asp-controller="Listing" asp-action="Create">
+                                <i class="bi bi-plus-circle me-1"></i>İlan Ekle
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Listing" asp-action="Index">Ilanlar</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Favorite" asp-action="Index">Favoriler</a>
+                            <a class="nav-link" asp-controller="Favorite" asp-action="Index">
+                                <i class="bi bi-heart me-1"></i>Favoriler
+                            </a>
                         </li>
                     </ul>
 
@@ -50,14 +62,25 @@
         </nav>
     </header>
 
-    <div class="container-xxl app-shell">
-        <main role="main" class="pb-3">
+    <div class="container-xxl app-shell py-4">
+        <main role="main">
 
-            @* ✅ HATA MESAJI (Favoriye ekleme başarısız vs.) *@
+            @* ✅ HATA MESAJI *@
             @if (TempData["Error"] != null)
             {
-                <div class="alert alert-danger">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-emoji-frown me-2"></i>
                     @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-emoji-smile me-2"></i>
+                    @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
 
@@ -65,9 +88,36 @@
         </main>
     </div>
 
-    <footer class="app-footer text-muted">
+    <footer class="app-footer">
         <div class="container">
-            &copy; 2025 - RealEstate.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-2 mb-2">
+                        <span class="d-inline-flex align-items-center justify-content-center rounded-circle" 
+                              style="width: 36px; height: 36px; background: linear-gradient(135deg, #f472b6, #ec4899);">
+                            <i class="bi bi-house-heart-fill text-white"></i>
+                        </span>
+                        <span class="fw-bold text-white">Senin Evin</span>
+                    </div>
+                    <p class="mb-0 small opacity-75">© 2025 Senin Evin. Sevgiyle yapıldı 💕</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <div class="d-flex gap-3 justify-content-center justify-content-md-end">
+                        <a href="#" class="opacity-75 hover-lift" style="color: #f9a8d4;">
+                            <i class="bi bi-instagram fs-5"></i>
+                        </a>
+                        <a href="#" class="opacity-75 hover-lift" style="color: #f9a8d4;">
+                            <i class="bi bi-twitter-x fs-5"></i>
+                        </a>
+                        <a href="#" class="opacity-75 hover-lift" style="color: #f9a8d4;">
+                            <i class="bi bi-facebook fs-5"></i>
+                        </a>
+                        <a href="#" class="opacity-75 hover-lift" style="color: #f9a8d4;">
+                            <i class="bi bi-youtube fs-5"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </footer>
 

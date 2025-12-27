@@ -1,0 +1,12 @@
+[phases.setup]
+nixPkgs = ["dotnet-sdk_8"]
+
+[phases.build]
+cmds = ["dotnet publish -c Release -o out"]
+
+[start]
+cmd = "dotnet out/RealEstate.Api.dll"
+
+[variables]
+ASPNETCORE_URLS = "http://0.0.0.0:${PORT:-8080}"
+ASPNETCORE_ENVIRONMENT = "Production"

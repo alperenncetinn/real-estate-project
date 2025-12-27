@@ -18,7 +18,7 @@ namespace RealEstate.Api.Repositories
 
         public async Task<List<Listing>> GetAllAsync(bool includeInactive, bool isAdmin, string? type)
         {
-            var query = _context.Listings.Include(l => l.Owner).AsQueryable();
+            var query = _context.Listings.Include(l => l.Owner).Include(l => l.Images).AsQueryable();
 
             if (!isAdmin || !includeInactive)
             {
@@ -36,13 +36,14 @@ namespace RealEstate.Api.Repositories
         public async Task<List<Listing>> GetByUserIdAsync(int userId)
         {
             return await _context.Listings
+                .Include(l => l.Images)
                 .Where(l => l.UserId == userId)
                 .ToListAsync();
         }
 
         public async Task<Listing?> GetByIdAsync(int id, bool includeOwner = false)
         {
-            var query = _context.Listings.AsQueryable();
+            var query = _context.Listings.Include(l => l.Images).AsQueryable();
 
             if (includeOwner)
             {

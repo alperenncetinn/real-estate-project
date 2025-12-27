@@ -3,69 +3,266 @@
     ViewData["Title"] = "Kayıt Ol";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="card shadow">
-            <div class="card-header bg-success text-white">
-                <h4 class="mb-0">Kayıt Ol</h4>
+<div class="row justify-content-center py-4">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg border-0" style="border-radius: 1.5rem; overflow: hidden;">
+            <!-- Header -->
+            <div class="text-center text-white py-4" style="background: linear-gradient(135deg, #f472b6, #ec4899);">
+                <span style="font-size: 3rem;">🏠</span>
+                <h4 class="mb-0 mt-2 fw-bold">Senin Evin'e Katıl</h4>
+                <p class="mb-0 opacity-75 small">Hayalindeki evi bulmak için kayıt ol</p>
             </div>
-            <div class="card-body">
-                <form asp-action="Register" method="post">
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="FirstName" class="form-label"></label>
-                            <input asp-for="FirstName" class="form-control" placeholder="Adınız" />
-                            <span asp-validation-for="FirstName" class="text-danger"></span>
+            <div class="card-body p-4">
+                <!-- Step Indicator -->
+                <div class="d-flex justify-content-center gap-2 mb-4">
+                    <div id="step1Indicator" class="step-indicator active">1</div>
+                    <div class="step-line"></div>
+                    <div id="step2Indicator" class="step-indicator">2</div>
+                    <div class="step-line"></div>
+                    <div id="step3Indicator" class="step-indicator">3</div>
+                </div>
+
+                <!-- STEP 1: Email Gir -->
+                <div id="step1Panel">
+                    <h5 class="text-center mb-3">📧 Email Adresinizi Girin</h5>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Email Adresi</label>
+                        <input type="email" id="emailInput" class="form-control form-control-lg" 
+                               placeholder="ornek@email.com" style="border-radius: 1rem;" />
+                        <div id="emailError" class="text-danger small mt-1" style="display: none;"></div>
+                    </div>
+                    <button type="button" id="sendCodeBtn" class="btn btn-primary w-100 btn-lg rounded-pill" onclick="sendVerificationCode()">
+                        <i class="bi bi-envelope-arrow-up me-2"></i>Doğrulama Kodu Gönder
+                    </button>
+                </div>
+
+                <!-- STEP 2: Kodu Gir -->
+                <div id="step2Panel" style="display: none;">
+                    <h5 class="text-center mb-3">🔐 Doğrulama Kodu</h5>
+                    <p class="text-center text-muted small mb-3">
+                        <span id="sentEmailDisplay"></span> adresine 6 haneli kod gönderdik
+                    </p>
+                    <div class="mb-3">
+                        <input type="text" id="codeInput" class="form-control form-control-lg text-center fw-bold" 
+                               placeholder="______" maxlength="6" style="border-radius: 1rem; letter-spacing: 0.5rem; font-size: 1.5rem;" />
+                        <div id="codeError" class="text-danger small mt-1" style="display: none;"></div>
+                    </div>
+                    <button type="button" id="verifyCodeBtn" class="btn btn-primary w-100 btn-lg rounded-pill" onclick="verifyCode()">
+                        <i class="bi bi-check-circle me-2"></i>Kodu Doğrula
+                    </button>
+                    <div class="text-center mt-3">
+                        <button type="button" class="btn btn-link btn-sm text-muted" onclick="resendCode()">
+                            Kod gelmedi mi? Tekrar gönder
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Kayıt Formu -->
+                <div id="step3Panel" style="display: none;">
+                    <h5 class="text-center mb-3">✨ Bilgilerinizi Tamamlayın</h5>
+                    <form asp-action="Register" method="post" id="registerForm">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        <input type="hidden" asp-for="Email" id="hiddenEmail" />
+                        <input type="hidden" id="hiddenVerified" name="EmailVerified" value="true" />
+
+                        <div class="mb-2 p-2 rounded-3" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0);">
+                            <small class="fw-semibold" style="color: #047857;">
+                                ✅ <span id="verifiedEmailDisplay"></span> doğrulandı!
+                            </small>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="LastName" class="form-label"></label>
-                            <input asp-for="LastName" class="form-control" placeholder="Soyadınız" />
-                            <span asp-validation-for="LastName" class="text-danger"></span>
+
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label asp-for="FirstName" class="form-label fw-semibold">Ad</label>
+                                <input asp-for="FirstName" class="form-control" placeholder="Adınız" style="border-radius: 0.75rem;" />
+                                <span asp-validation-for="FirstName" class="text-danger small"></span>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label asp-for="LastName" class="form-label fw-semibold">Soyad</label>
+                                <input asp-for="LastName" class="form-control" placeholder="Soyadınız" style="border-radius: 0.75rem;" />
+                                <span asp-validation-for="LastName" class="text-danger small"></span>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Email" class="form-label"></label>
-                        <input asp-for="Email" class="form-control" placeholder="ornek@email.com" />
-                        <span asp-validation-for="Email" class="text-danger"></span>
-                    </div>
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label fw-semibold">Telefon (Opsiyonel)</label>
+                            <input asp-for="PhoneNumber" class="form-control" 
+                                   placeholder="05XX XXX XX XX" 
+                                   style="border-radius: 0.75rem;"
+                                   pattern="^(05\d{9}|5\d{9})$"
+                                   maxlength="11"
+                                   inputmode="numeric"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
+                            <small class="text-muted">Örn: 05321234567</small>
+                            <span asp-validation-for="PhoneNumber" class="text-danger small d-block"></span>
+                        </div>
 
-                    <div class="mb-3">
-                        <label asp-for="PhoneNumber" class="form-label"></label>
-                        <input asp-for="PhoneNumber" class="form-control" placeholder="05XX XXX XX XX" />
-                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                        <small class="text-muted">İlan sahipliğinde görüntülenmek için telefon numaranızı girin.</small>
-                    </div>
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label fw-semibold">Şifre</label>
+                            <input asp-for="Password" class="form-control" placeholder="En az 6 karakter" style="border-radius: 0.75rem;" />
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Password" class="form-label"></label>
-                        <input asp-for="Password" class="form-control" placeholder="En az 6 karakter" />
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                    </div>
+                        <div class="mb-3">
+                            <label asp-for="ConfirmPassword" class="form-label fw-semibold">Şifre Tekrar</label>
+                            <input asp-for="ConfirmPassword" class="form-control" placeholder="Şifrenizi tekrar girin" style="border-radius: 0.75rem;" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        </div>
 
-                    <div class="mb-3">
-                        <label asp-for="ConfirmPassword" class="form-label"></label>
-                        <input asp-for="ConfirmPassword" class="form-control" placeholder="Şifrenizi tekrar girin" />
-                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                    </div>
+                        <button type="submit" class="btn btn-success w-100 btn-lg rounded-pill">
+                            <i class="bi bi-person-plus me-2"></i>Kayıt Ol 🎉
+                        </button>
+                    </form>
+                </div>
 
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-success">Kayıt Ol</button>
-                    </div>
-                </form>
-
-                <hr />
+                <hr class="my-4" />
 
                 <div class="text-center">
-                    <p class="mb-0">Zaten hesabınız var mı? <a asp-action="Login">Giriş Yap</a></p>
+                    <p class="mb-0 text-muted">Zaten hesabınız var mı? <a asp-action="Login" style="color: #ec4899; font-weight: 600;">Giriş Yap</a></p>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<style>
+    .step-indicator {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.9rem;
+        background: #e5e7eb;
+        color: #6b7280;
+        transition: all 0.3s ease;
+    }
+    .step-indicator.active {
+        background: linear-gradient(135deg, #f472b6, #ec4899);
+        color: white;
+        box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+    }
+    .step-indicator.completed {
+        background: linear-gradient(135deg, #2dd4bf, #14b8a6);
+        color: white;
+    }
+    .step-line {
+        width: 40px;
+        height: 3px;
+        background: #e5e7eb;
+        align-self: center;
+        border-radius: 2px;
+    }
+    #codeInput::placeholder {
+        letter-spacing: 0.3rem;
+    }
+</style>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        let verifiedEmail = '';
+        const apiBaseUrl = 'http://localhost:5180';
+
+        async function sendVerificationCode() {
+            const email = document.getElementById('emailInput').value.trim();
+            const errorDiv = document.getElementById('emailError');
+            const btn = document.getElementById('sendCodeBtn');
+
+            if (!email || email.indexOf('@@') === -1) {
+                errorDiv.textContent = 'Geçerli bir email adresi girin';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Gönderiliyor...';
+            errorDiv.style.display = 'none';
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/api/auth/send-verification-code`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    verifiedEmail = email;
+                    document.getElementById('sentEmailDisplay').textContent = email;
+                    document.getElementById('step1Panel').style.display = 'none';
+                    document.getElementById('step2Panel').style.display = 'block';
+                    document.getElementById('step1Indicator').classList.remove('active');
+                    document.getElementById('step1Indicator').classList.add('completed');
+                    document.getElementById('step2Indicator').classList.add('active');
+                } else {
+                    errorDiv.textContent = data.message || 'Bir hata oluştu';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Sunucuya bağlanılamadı. Lütfen tekrar deneyin.';
+                errorDiv.style.display = 'block';
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-envelope-arrow-up me-2"></i>Doğrulama Kodu Gönder';
+        }
+
+        async function verifyCode() {
+            const code = document.getElementById('codeInput').value.trim();
+            const errorDiv = document.getElementById('codeError');
+            const btn = document.getElementById('verifyCodeBtn');
+
+            if (!code || code.length !== 6) {
+                errorDiv.textContent = '6 haneli kodu girin';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Doğrulanıyor...';
+            errorDiv.style.display = 'none';
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/api/auth/verify-email`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: verifiedEmail, code: code })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.verified) {
+                    document.getElementById('hiddenEmail').value = verifiedEmail;
+                    document.getElementById('verifiedEmailDisplay').textContent = verifiedEmail;
+                    document.getElementById('step2Panel').style.display = 'none';
+                    document.getElementById('step3Panel').style.display = 'block';
+                    document.getElementById('step2Indicator').classList.remove('active');
+                    document.getElementById('step2Indicator').classList.add('completed');
+                    document.getElementById('step3Indicator').classList.add('active');
+                } else {
+                    errorDiv.textContent = data.message || 'Geçersiz kod';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Sunucuya bağlanılamadı';
+                errorDiv.style.display = 'block';
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Kodu Doğrula';
+        }
+
+        function resendCode() {
+            document.getElementById('codeInput').value = '';
+            document.getElementById('codeError').style.display = 'none';
+            document.getElementById('emailInput').value = verifiedEmail;
+            sendVerificationCode();
+        }
+    </script>
 }

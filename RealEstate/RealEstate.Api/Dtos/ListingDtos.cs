@@ -37,5 +37,15 @@ namespace RealEstate.Api.Dtos
         public string? OwnerPhone { get; set; }
         public string? DeactivationReason { get; set; }
         public DateTime? DeactivatedAt { get; set; }
+
+        // Base64 Images from images table
+        public List<ListingImageDto>? Images { get; set; }
+    }
+
+    public class ListingImageDto
+    {
+        public int Id { get; set; }
+        public string? Base64Data { get; set; }
+        public string? FileName { get; set; }
     }
 }

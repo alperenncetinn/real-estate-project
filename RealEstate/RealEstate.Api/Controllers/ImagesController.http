@@ -1,0 +1,33 @@
+### Görsel Ekleme (POST)
+
+```
+POST /api/Images
+Content-Type: application/json
+
+{
+  "listingId": 1,
+  "base64Data": "iVBORw0KGgoAAAANSUhEUgAA...", // örnek base64 string
+  "fileName": "ev1.png"
+}
+```
+
+### İlan Görsellerini Listeleme (GET)
+
+```
+GET /api/Images/listing/1
+```
+
+Yanıt:
+```
+[
+  {
+    "id": 5,
+    "listingId": 1,
+    "base64Data": "iVBORw0KGgoAAAANSUhEUgAA...",
+    "fileName": "ev1.png"
+  },
+  ...
+]
+```
+
+Başarılı yanıtlar için örneklerdir. Gerçek base64 verisi daha uzun olacaktır.

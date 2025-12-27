@@ -19,7 +19,7 @@ namespace RealEstate.Api.Entities
         public string Type { get; set; } = "Satılık";
 
         // --- YENİ EKLENEN ALANLAR ---
-        public string? RoomCount { get; set; } 
+        public string? RoomCount { get; set; }
         public int SquareMeters { get; set; }
         // ----------------------------
 
@@ -40,5 +40,8 @@ namespace RealEstate.Api.Entities
         // HATA VEREN KISIM BURASIYDI, BUNU EKLEDİK:
         [ForeignKey("DeactivatedByUserId")]
         public virtual User? DeactivatedBy { get; set; }
+
+        // İlanın görselleri
+        public ICollection<Image>? Images { get; set; }
     }
 }

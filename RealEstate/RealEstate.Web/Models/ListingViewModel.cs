@@ -22,5 +22,15 @@ namespace RealEstate.Web.Models
         public string? OwnerPhone { get; set; }
         public string? DeactivationReason { get; set; }
         public DateTime? DeactivatedAt { get; set; }
+
+        // Base64 Images
+        public List<ListingImageViewModel>? Images { get; set; }
+    }
+
+    public class ListingImageViewModel
+    {
+        public int Id { get; set; }
+        public string? Base64Data { get; set; }
+        public string? FileName { get; set; }
     }
 }

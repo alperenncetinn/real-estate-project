@@ -1,5 +1,99 @@
+/* ============================================
+   🏠 SENİN EVİN - PASTEL & COZY DESIGN
+   ============================================ */
+
+/* ---------- CSS VARIABLES - PASTEL PALETTE ---------- */
+:root {
+  /* Primary - Soft Rose/Pink */
+  --primary-50: #fdf2f8;
+  --primary-100: #fce7f3;
+  --primary-200: #fbcfe8;
+  --primary-300: #f9a8d4;
+  --primary-400: #f472b6;
+  --primary-500: #ec4899;
+  --primary-600: #db2777;
+  --primary-700: #be185d;
+
+  /* Accent - Soft Teal/Mint */
+  --accent-50: #f0fdfa;
+  --accent-100: #ccfbf1;
+  --accent-200: #99f6e4;
+  --accent-300: #5eead4;
+  --accent-400: #2dd4bf;
+  --accent-500: #14b8a6;
+  --accent-600: #0d9488;
+
+  /* Warm - Soft Peach/Orange */
+  --warm-50: #fff7ed;
+  --warm-100: #ffedd5;
+  --warm-200: #fed7aa;
+  --warm-300: #fdba74;
+  --warm-400: #fb923c;
+  --warm-500: #f97316;
+
+  /* Lavender */
+  --lavender-50: #faf5ff;
+  --lavender-100: #f3e8ff;
+  --lavender-200: #e9d5ff;
+  --lavender-300: #d8b4fe;
+  --lavender-400: #c084fc;
+  --lavender-500: #a855f7;
+
+  /* Sky Blue */
+  --sky-50: #f0f9ff;
+  --sky-100: #e0f2fe;
+  --sky-200: #bae6fd;
+  --sky-300: #7dd3fc;
+  --sky-400: #38bdf8;
+  --sky-500: #0ea5e9;
+
+  /* Neutral - Warm Gray */
+  --neutral-50: #fafaf9;
+  --neutral-100: #f5f5f4;
+  --neutral-200: #e7e5e4;
+  --neutral-300: #d6d3d1;
+  --neutral-400: #a8a29e;
+  --neutral-500: #78716c;
+  --neutral-600: #57534e;
+  --neutral-700: #44403c;
+  --neutral-800: #292524;
+  --neutral-900: #1c1917;
+
+  /* Shadows - Softer */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.15);
+  --shadow-pink: 0 10px 40px -10px rgba(236, 72, 153, 0.3);
+  --shadow-teal: 0 10px 40px -10px rgba(20, 184, 166, 0.3);
+
+  /* Radius - Rounder */
+  --radius-sm: 0.5rem;
+  --radius: 0.75rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---------- RESET & BASE ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 html {
-  font-size: 14px;
+  font-size: 15px;
+  scroll-behavior: smooth;
 }
 
 @media (min-width: 768px) {
@@ -8,47 +102,695 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
 body {
-  margin-bottom: 60px;
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(180deg, var(--primary-50) 0%, var(--neutral-50) 30%, #fff 100%);
+  min-height: 100vh;
+  color: var(--neutral-700);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Listing Card Styles */
+/* ---------- NAVBAR ---------- */
+.app-navbar {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--primary-100);
+  box-shadow: var(--shadow);
+  padding: 0.75rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  transition: all var(--transition);
+}
+
+.app-navbar .navbar-brand {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--primary-500) !important;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.app-navbar .navbar-brand:hover {
+  color: var(--primary-600) !important;
+}
+
+.app-navbar .nav-link {
+  font-weight: 600;
+  color: var(--neutral-500) !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: var(--radius-full);
+  transition: all var(--transition);
+  font-size: 0.95rem;
+}
+
+.app-navbar .nav-link:hover {
+  color: var(--primary-500) !important;
+  background: var(--primary-50);
+}
+
+.app-navbar .nav-link i {
+  color: var(--primary-400);
+}
+
+/* ---------- BUTTONS ---------- */
+.btn {
+  font-weight: 600;
+  padding: 0.7rem 1.5rem;
+  border-radius: var(--radius-full);
+  transition: all var(--transition);
+  border: none;
+  font-size: 0.95rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-400) 0%, var(--primary-500) 100%);
+  color: white;
+  box-shadow: var(--shadow-pink);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px -10px rgba(236, 72, 153, 0.4);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--accent-400) 0%, var(--accent-500) 100%);
+  color: white;
+  box-shadow: var(--shadow-teal);
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, var(--accent-500) 0%, var(--accent-600) 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px -10px rgba(20, 184, 166, 0.4);
+}
+
+.btn-outline-primary {
+  border: 2px solid var(--primary-300);
+  color: var(--primary-500);
+  background: transparent;
+}
+
+.btn-outline-primary:hover {
+  background: var(--primary-500);
+  border-color: var(--primary-500);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.btn-outline-danger {
+  border: 2px solid var(--primary-300);
+  color: var(--primary-500);
+  background: var(--primary-50);
+}
+
+.btn-outline-danger:hover {
+  background: var(--primary-500);
+  border-color: var(--primary-500);
+  color: white;
+}
+
+.btn-light {
+  background: white;
+  color: var(--primary-600);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-light:hover {
+  background: var(--primary-50);
+  color: var(--primary-700);
+  transform: translateY(-2px);
+}
+
+.btn-outline-light {
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  color: white;
+  background: transparent;
+}
+
+.btn-outline-light:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: white;
+  color: white;
+}
+
+/* ---------- CARDS ---------- */
+.card {
+  border: none;
+  border-radius: var(--radius-xl);
+  background: white;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition);
+  overflow: hidden;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-xl);
+}
+
 .listing-card {
-  transition: transform 0.2s, box-shadow 0.2s;
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+  transition: all var(--transition-slow);
+  background: white;
+  border: 1px solid var(--neutral-100);
 }
 
 .listing-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: var(--shadow-2xl);
+  border-color: var(--primary-200);
 }
 
+.listing-card .card-body {
+  padding: 1.25rem;
+}
+
+.listing-card .card-title {
+  font-weight: 700;
+  color: var(--neutral-800);
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.listing-card .card-footer {
+  background: var(--neutral-50);
+  border-top: 1px solid var(--neutral-100);
+  padding: 0.875rem 1.25rem;
+}
+
+/* ---------- LISTING IMAGE ---------- */
 .listing-img {
   width: 100%;
-  height: 250px;
+  height: 200px;
   object-fit: cover;
   object-position: center;
-  border-radius: 0.375rem 0.375rem 0 0;
+  transition: transform var(--transition-slow);
+}
+
+.listing-card:hover .listing-img {
+  transform: scale(1.08);
 }
 
 .listing-placeholder {
   width: 100%;
-  height: 250px;
-  background-color: #f1f5f9;
-  border-radius: 0.375rem 0.375rem 0 0;
+  height: 200px;
+  background: linear-gradient(135deg, var(--primary-50) 0%, var(--lavender-50) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* ---------- BADGES ---------- */
 .listing-badge {
-  font-size: 0.875rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.badge.bg-success {
+  background: linear-gradient(135deg, var(--accent-400) 0%, var(--accent-500) 100%) !important;
+  box-shadow: 0 4px 15px -5px rgba(20, 184, 166, 0.4);
+}
+
+.badge.bg-warning {
+  background: linear-gradient(135deg, var(--warm-300) 0%, var(--warm-400) 100%) !important;
+  color: white !important;
+  box-shadow: 0 4px 15px -5px rgba(251, 146, 60, 0.4);
+}
+
+.badge.bg-info {
+  background: linear-gradient(135deg, var(--sky-300) 0%, var(--sky-400) 100%) !important;
+  box-shadow: 0 4px 15px -5px rgba(56, 189, 248, 0.4);
+}
+
+.badge.bg-danger {
+  background: linear-gradient(135deg, var(--primary-400) 0%, var(--primary-500) 100%) !important;
+  box-shadow: 0 4px 15px -5px rgba(236, 72, 153, 0.4);
+}
+
+.badge.bg-primary {
+  background: linear-gradient(135deg, var(--primary-400) 0%, var(--primary-500) 100%) !important;
+}
+
+/* ---------- FILTER CARD ---------- */
+.filter-card {
+  border-radius: var(--radius-xl);
+  background: white;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--primary-100);
+  overflow: hidden;
+}
+
+.filter-card .card-header {
+  background: linear-gradient(135deg, var(--primary-400) 0%, var(--primary-500) 100%);
+  color: white;
+  border: none;
+  padding: 1.25rem;
+}
+
+.filter-card .card-header h5 {
+  font-weight: 700;
+  margin: 0;
+}
+
+.filter-card .card-body {
+  padding: 1.5rem;
+}
+
+.filter-card .form-label {
+  color: var(--neutral-600);
   font-weight: 600;
-  padding: 0.375rem 0.75rem;
-  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.filter-card .form-control,
+.filter-card .form-select {
+  border: 2px solid var(--neutral-200);
+  border-radius: var(--radius);
+  padding: 0.7rem 1rem;
+  transition: all var(--transition);
+  background: var(--neutral-50);
+}
+
+.filter-card .form-control:focus,
+.filter-card .form-select:focus {
+  border-color: var(--primary-300);
+  box-shadow: 0 0 0 4px var(--primary-100);
+  background: white;
+}
+
+/* ---------- PRICE DISPLAY ---------- */
+.text-primary {
+  color: var(--primary-500) !important;
+}
+
+.listing-card .text-primary {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--primary-500) !important;
+}
+
+/* ---------- ALERTS ---------- */
+.alert {
+  border-radius: var(--radius-lg);
+  border: none;
+  padding: 1rem 1.25rem;
+  font-weight: 500;
+}
+
+.alert-success {
+  background: linear-gradient(135deg, var(--accent-50) 0%, var(--accent-100) 100%);
+  color: var(--accent-600);
+  border: 1px solid var(--accent-200);
+}
+
+.alert-warning {
+  background: linear-gradient(135deg, var(--warm-50) 0%, var(--warm-100) 100%);
+  color: var(--warm-500);
+  border: 1px solid var(--warm-200);
+}
+
+.alert-danger {
+  background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 100%);
+  color: var(--primary-600);
+  border: 1px solid var(--primary-200);
+}
+
+.alert-info {
+  background: linear-gradient(135deg, var(--sky-50) 0%, var(--sky-100) 100%);
+  color: var(--sky-500);
+  border: 1px solid var(--sky-200);
+}
+
+/* ---------- EMPTY STATE ---------- */
+.empty-state {
+  background: linear-gradient(135deg, var(--warm-50) 0%, var(--warm-100) 100%);
+  border-radius: var(--radius-xl);
+  padding: 3rem !important;
+  border: 1px solid var(--warm-200);
+}
+
+.empty-state h4 {
+  color: var(--warm-500);
+  font-weight: 700;
+}
+
+/* ---------- PAGINATION ---------- */
+.pagination {
+  gap: 0.5rem;
+}
+
+.page-item .page-link {
+  border: none;
+  border-radius: var(--radius-full) !important;
+  padding: 0.625rem 1rem;
+  font-weight: 600;
+  color: var(--neutral-500);
+  background: white;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+}
+
+.page-item .page-link:hover {
+  background: var(--primary-50);
+  color: var(--primary-500);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.page-item.active .page-link {
+  background: linear-gradient(135deg, var(--primary-400) 0%, var(--primary-500) 100%);
+  color: white;
+  box-shadow: var(--shadow-pink);
+}
+
+.page-item.disabled .page-link {
+  background: var(--neutral-100);
+  color: var(--neutral-400);
+  box-shadow: none;
+}
+
+/* ---------- FORMS ---------- */
+.form-control,
+.form-select {
+  border: 2px solid var(--neutral-200);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+  transition: all var(--transition);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary-300);
+  box-shadow: 0 0 0 4px var(--primary-100);
+}
+
+.form-control::placeholder {
+  color: var(--neutral-400);
+}
+
+/* ---------- TABLES ---------- */
+.table {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.table thead {
+  background: linear-gradient(135deg, var(--primary-50) 0%, var(--lavender-50) 100%);
+}
+
+.table th {
+  font-weight: 700;
+  color: var(--neutral-600);
+  border: none;
+  padding: 1rem;
+}
+
+.table td {
+  vertical-align: middle;
+  padding: 1rem;
+  border-color: var(--neutral-100);
+}
+
+.table-hover tbody tr:hover {
+  background: var(--primary-50);
+}
+
+/* ---------- FOOTER ---------- */
+.app-footer {
+  background: linear-gradient(135deg, var(--neutral-800) 0%, var(--neutral-900) 100%);
+  color: var(--neutral-300);
+  padding: 2.5rem 0;
+  margin-top: 5rem;
+}
+
+.app-footer a {
+  color: var(--primary-300);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+.app-footer a:hover {
+  color: var(--primary-200);
+}
+
+/* ---------- HERO SECTION ---------- */
+.hero-section {
+  background: linear-gradient(135deg, var(--primary-400) 0%, var(--primary-500) 40%, var(--lavender-400) 100%);
+  color: white;
+  padding: 4rem 2rem;
+  border-radius: var(--radius-2xl);
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: float 6s ease-in-out infinite;
+}
+
+.hero-section::after {
+  content: '';
+  position: absolute;
+  bottom: -40%;
+  left: -15%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: float 8s ease-in-out infinite reverse;
+}
+
+/* ---------- ANIMATIONS ---------- */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.listing-card {
+  animation: fadeInUp 0.6s ease-out backwards;
+}
+
+.listing-card:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.listing-card:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.listing-card:nth-child(3) {
+  animation-delay: 0.15s;
+}
+
+.listing-card:nth-child(4) {
+  animation-delay: 0.2s;
+}
+
+.listing-card:nth-child(5) {
+  animation-delay: 0.25s;
+}
+
+.listing-card:nth-child(6) {
+  animation-delay: 0.3s;
+}
+
+/* ---------- SCROLLBAR ---------- */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--neutral-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--primary-300) 0%, var(--primary-400) 100%);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, var(--primary-400) 0%, var(--primary-500) 100%);
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 768px) {
+  .listing-img {
+    height: 180px;
+  }
+
+  .hero-section {
+    padding: 2.5rem 1.5rem;
+    border-radius: var(--radius-xl);
+  }
+
+  .filter-card {
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* ---------- UTILITIES ---------- */
+.glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--primary-400) 0%, var(--primary-600) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hover-lift {
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ---------- BTN GROUP FIX ---------- */
+.btn-group .btn {
+  border-radius: 0;
+}
+
+.btn-group .btn:first-child {
+  border-radius: var(--radius-full) 0 0 var(--radius-full);
+}
+
+.btn-group .btn:last-child {
+  border-radius: 0 var(--radius-full) var(--radius-full) 0;
+}
+
+/* ---------- LISTING META ---------- */
+.listing-meta {
+  color: var(--neutral-400);
+}
+
+.listing-meta i {
+  margin-right: 0.25rem;
+  color: var(--primary-300);
+}
+
+/* ---------- FOCUS STATES ---------- */
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+  box-shadow: 0 0 0 4px var(--primary-100);
+  outline: none;
+}
+
+/* ---------- IMAGE OVERFLOW HIDDEN ---------- */
+.listing-card .position-relative {
+  overflow: hidden;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+/* ---------- SPECIAL ACCENTS ---------- */
+.accent-blob {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: linear-gradient(135deg, var(--primary-200), var(--lavender-200));
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.5;
+  z-index: -1;
+}
+
+/* Heart Icon Animation */
+.btn-outline-danger:hover i,
+.btn-outline-danger:hover::before {
+  animation: pulse 0.5s ease-in-out;
+}
+
+/* Category Cards */
+.category-hover {
+  transition: all var(--transition-slow);
+  border-radius: var(--radius-2xl);
+}
+
+.category-hover:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--shadow-2xl);
+}
+
+/* Dropdown Styling */
+.dropdown-menu {
+  border: none;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  padding: 0.5rem;
+}
+
+.dropdown-item {
+  border-radius: var(--radius);
+  padding: 0.625rem 1rem;
+  font-weight: 500;
+  transition: all var(--transition);
+}
+
+.dropdown-item:hover {
+  background: var(--primary-50);
+  color: var(--primary-600);
 }

@@ -18,12 +18,14 @@ namespace RealEstate.Api.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IJwtService _jwtService;
         private readonly IConfiguration _configuration;
+        private readonly IEmailService _emailService;
 
-        public AuthController(ApplicationDbContext context, IJwtService jwtService, IConfiguration configuration)
+        public AuthController(ApplicationDbContext context, IJwtService jwtService, IConfiguration configuration, IEmailService emailService)
         {
             _context = context;
             _jwtService = jwtService;
             _configuration = configuration;
+            _emailService = emailService;
         }
 
         [HttpPost("login")]
@@ -252,6 +254,77 @@ namespace RealEstate.Api.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "User has been deleted." });
+        }
+
+        // ==================== EMAIL VERIFICATION ====================
+
+        [HttpPost("send-verification-code")]
+        public async Task<IActionResult> SendVerificationCode([FromBody] SendVerificationCodeDto request)
+        {
+            if (string.IsNullOrWhiteSpace(request?.Email))
+                return BadRequest(new { message = "Email adresi gerekli." });
+
+            // Mevcut kullanıcı var mı kontrol et
+            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+                return BadRequest(new { message = "Bu email adresi zaten kayıtlı." });
+
+            // Eski kodları geçersiz yap
+            var oldCodes = await _context.VerificationCodes
+                .Where(v => v.Email == request.Email && !v.IsUsed && v.Type == "email_verification")
+                .ToListAsync();
+            
+            foreach (var oldCode in oldCodes)
+            {
+                oldCode.IsUsed = true;
+            }
+
+            // Yeni kod oluştur (6 haneli)
+            var code = new Random().Next(100000, 999999).ToString();
+
+            var verificationCode = new VerificationCode
+            {
+                Email = request.Email,
+                Code = code,
+                CreatedAt = DateTime.UtcNow,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(10),
+                Type = "email_verification"
+            };
+
+            _context.VerificationCodes.Add(verificationCode);
+            await _context.SaveChangesAsync();
+
+            // Email gönder
+            var emailSent = await _emailService.SendVerificationCodeAsync(request.Email, code);
+
+            if (!emailSent)
+                return StatusCode(500, new { message = "Email gönderilemedi. Lütfen tekrar deneyin." });
+
+            return Ok(new { message = "Doğrulama kodu email adresinize gönderildi." });
+        }
+
+        [HttpPost("verify-email")]
+        public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailDto request)
+        {
+            if (string.IsNullOrWhiteSpace(request?.Email) || string.IsNullOrWhiteSpace(request?.Code))
+                return BadRequest(new { message = "Email ve doğrulama kodu gerekli." });
+
+            var verificationCode = await _context.VerificationCodes
+                .Where(v => v.Email == request.Email 
+                         && v.Code == request.Code 
+                         && !v.IsUsed 
+                         && v.Type == "email_verification"
+                         && v.ExpiresAt > DateTime.UtcNow)
+                .OrderByDescending(v => v.CreatedAt)
+                .FirstOrDefaultAsync();
+
+            if (verificationCode == null)
+                return BadRequest(new { message = "Geçersiz veya süresi dolmuş doğrulama kodu." });
+
+            // Kodu kullanıldı olarak işaretle
+            verificationCode.IsUsed = true;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Email doğrulandı!", verified = true });
         }
 
         // ==================== HELPER METHODS ====================
