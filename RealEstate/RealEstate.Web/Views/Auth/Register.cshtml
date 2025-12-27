@@ -162,11 +162,13 @@
     }
 </style>
 
+@inject IConfiguration Configuration
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
         let verifiedEmail = '';
-        const apiBaseUrl = 'http://localhost:5180';
+        const apiBaseUrl = '@Configuration["ApiSettings:BaseUrl"]';
 
         async function sendVerificationCode() {
             const email = document.getElementById('emailInput').value.trim();
